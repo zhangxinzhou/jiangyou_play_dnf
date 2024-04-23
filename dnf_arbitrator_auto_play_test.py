@@ -26,32 +26,8 @@ class PlayTest(unittest.TestCase):
         print("*" * 50, "method end", "*" * 50)
         print()
 
-    def test_role001(self):
+    def test_role(self):
         role = DnfArbitratorRole001()
-        role.role_play()
-
-    def test_role002(self):
-        role = DnfArbitratorRole002()
-        role.role_play()
-
-    def test_role003(self):
-        role = DnfArbitratorRole003()
-        role.role_play()
-
-    def test_role004(self):
-        role = DnfArbitratorRole004()
-        role.role_play()
-
-    def test_role005(self):
-        role = DnfArbitratorRole005()
-        role.role_play()
-
-    def test_role006(self):
-        role = DnfArbitratorRole006()
-        role.role_play()
-
-    def test_role007(self):
-        role = DnfArbitratorRole007()
         role.role_play()
 
     def test_select_role(self):
