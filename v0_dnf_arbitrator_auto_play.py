@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pynput import keyboard
 
-from dnf_arbitrator_auto_play_utils import *
+from v0_dnf_arbitrator_auto_play_utils import *
 
 # 关闭安全模式
 pyautogui.FAILSAFE = False

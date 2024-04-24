@@ -1,6 +1,11 @@
 import unittest
 
-from dnf_arbitrator_auto_play import *
+from v0_dnf_arbitrator_auto_play import *
+
+
+def test_role():
+    role = DnfArbitratorRole001()
+    role.role_play()
 
 
 class PlayTest(unittest.TestCase):
@@ -25,22 +30,3 @@ class PlayTest(unittest.TestCase):
     def tearDown(self) -> None:
         print("*" * 50, "method end", "*" * 50)
         print()
-
-    def test_role(self):
-        role = DnfArbitratorRole001()
-        role.role_play()
-
-    def test_select_role(self):
-        to_ui_role_select()
-
-    def test_role_change(self):
-        pass
-
-    def test_to_arbitrator(self):
-        move_to_arbitrator()
-
-    def test_has_fatigue_point(self):
-        print(has_no_fatigue_point())
-
-    def test_play(self):
-        play()
