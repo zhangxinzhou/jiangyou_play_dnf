@@ -2,7 +2,7 @@ import ctypes
 import ctypes.wintypes
 import sys
 import time
-
+import redis
 import pyautogui
 import pydirectinput
 import win32api
@@ -18,7 +18,7 @@ program_exit = False
 program_pause = False
 
 
-# 按f2键,程序将会退出,退出原理:pyautogui打开安全模式,并且将鼠标移动到(0,0)位置触发异常事件
+# 退出和暂停功能的实现
 def on_press(key):
     global program_exit
     global program_pause
@@ -26,7 +26,7 @@ def on_press(key):
         program_exit = True
         print(f"you press key [{key}], program will exit after a few seconds.")
 
-    elif key == keyboard.Key.pause:
+    elif key == keyboard.Key.f3:
         program_pause = not program_pause
         if program_pause:
             print(f"you press key [{key}], program will pause after a few seconds.")
@@ -37,17 +37,24 @@ def on_press(key):
 listener = keyboard.Listener(on_press=on_press)
 listener.start()
 
+# 引入redis,用来记录执行的状态,可以让程序以外退出时,从上一个中断的角色继续刷深渊
+# redis_conn = redis.Redis(host='127.0.0.1', port='6379')
+redis_pool = redis.ConnectionPool(host='127.0.0.1', port=6379)
+redis_conn = redis.Redis(connection_pool=redis_pool)
 
-def hand_exit_and_pause() -> bool:
+
+def hand_exit_and_pause():
     global program_exit
     global program_pause
     if program_exit:
         print("program exit.")
         sys.exit(-1)
-    elif program_pause:
+    while program_pause:
+        if program_exit:
+            print("program exit.")
+            sys.exit(-1)
         print("program pause...")
-        return True
-    return False
+        time.sleep(1)
 
 
 def direct_press_key(key_list: list, duration=0.0, back_swing=0.0) -> None:
@@ -57,8 +64,7 @@ def direct_press_key(key_list: list, duration=0.0, back_swing=0.0) -> None:
     :param back_swing: 技能后摇时间,单位秒
     :return:
     """
-    while hand_exit_and_pause():
-        time.sleep(1)
+    hand_exit_and_pause()
 
     key_list_len = len(key_list)
     if key_list_len <= 0:
@@ -79,8 +85,7 @@ def direct_press_key(key_list: list, duration=0.0, back_swing=0.0) -> None:
 
 
 def mouse_left_click() -> None:
-    while hand_exit_and_pause():
-        time.sleep(1)
+    hand_exit_and_pause()
 
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 100, 100)
     time.sleep(0.1)
@@ -89,8 +94,7 @@ def mouse_left_click() -> None:
 
 
 def mouse_left_double_click() -> None:
-    while hand_exit_and_pause():
-        time.sleep(1)
+    hand_exit_and_pause()
 
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 100, 100)
     time.sleep(0.1)
@@ -103,8 +107,7 @@ def mouse_left_double_click() -> None:
 
 
 def mouse_right_click() -> None:
-    while hand_exit_and_pause():
-        time.sleep(1)
+    hand_exit_and_pause()
 
     win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, 100, 100)
     time.sleep(0.1)
