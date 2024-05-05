@@ -1,3 +1,6 @@
+import functools
+import json
+import time
 from abc import ABCMeta, abstractmethod, ABC
 from datetime import datetime
 
@@ -18,8 +21,11 @@ pydirectinput.PAUSE = 0.1
 class DnfArbitratorCommonRole(metaclass=ABCMeta):
     def __init__(self):
         super().__init__()
+        self.role_name = self.__class__.__name__
+        # 选择角色的位置
+        self.left = None
+        self.top = None
         self.press_key = direct_press_key
-        self.role_name = None
         self.round = 0
         self.max_round = 20
         self.round_time = time.time()
@@ -89,11 +95,12 @@ class DnfArbitratorCommonRole(metaclass=ABCMeta):
 
 
 # 角色001
-class DnfArbitratorRole001(DnfArbitratorCommonRole, ABC):
+class modao(DnfArbitratorCommonRole, ABC):
 
     def __init__(self):
         super().__init__()
-        self.role_name = 'r1_modao'
+        self.left = 2 / 8
+        self.top = 1 / 3
 
     # 关卡开始的操作,如上buff
     def stage_start(self):
@@ -115,11 +122,12 @@ class DnfArbitratorRole001(DnfArbitratorCommonRole, ABC):
 
 
 # 角色002
-class DnfArbitratorRole002(DnfArbitratorCommonRole, ABC):
+class naima01(DnfArbitratorCommonRole, ABC):
 
     def __init__(self):
         super().__init__()
-        self.role_name = 'r2_naima'
+        self.left = 3 / 8
+        self.top = 1 / 3
 
     # 关卡开始的操作,如上buff
     def stage_start(self):
@@ -142,11 +150,12 @@ class DnfArbitratorRole002(DnfArbitratorCommonRole, ABC):
         self.press_key(key_list=['q', 'a'], back_swing=5)
 
 
-class DnfArbitratorRole003(DnfArbitratorCommonRole, ABC):
+class nailuo(DnfArbitratorCommonRole, ABC):
 
     def __init__(self):
         super().__init__()
-        self.role_name = 'r3_nailio'
+        self.left = 4 / 8
+        self.top = 1 / 3
 
     # 关卡开始的操作,如上buff
     def stage_start(self):
@@ -168,11 +177,12 @@ class DnfArbitratorRole003(DnfArbitratorCommonRole, ABC):
         self.press_key(key_list=['ctrl'], back_swing=10)
 
 
-class DnfArbitratorRole004(DnfArbitratorCommonRole, ABC):
+class naima02(DnfArbitratorCommonRole, ABC):
 
     def __init__(self):
         super().__init__()
-        self.role_name = 'r4_naima'
+        self.left = 5 / 8
+        self.top = 1 / 3
 
     # 关卡开始的操作,如上buff
     def stage_start(self):
@@ -195,11 +205,12 @@ class DnfArbitratorRole004(DnfArbitratorCommonRole, ABC):
         self.press_key(key_list=['q', 'a'], back_swing=5)
 
 
-class DnfArbitratorRole005(DnfArbitratorCommonRole, ABC):
+class zhaohuan(DnfArbitratorCommonRole, ABC):
 
     def __init__(self):
         super().__init__()
-        self.role_name = 'r5_zhaohuan'
+        self.left = 6 / 8
+        self.top = 1 / 3
 
     # 关卡开始的操作,如上buff
     def stage_start(self):
@@ -219,11 +230,12 @@ class DnfArbitratorRole005(DnfArbitratorCommonRole, ABC):
         self.press_key(key_list=['y'], back_swing=8)
 
 
-class DnfArbitratorRole006(DnfArbitratorCommonRole, ABC):
+class saber(DnfArbitratorCommonRole, ABC):
 
     def __init__(self):
         super().__init__()
-        self.role_name = 'r6_saber'
+        self.left = 1 / 8
+        self.top = 2 / 3
 
     # 关卡开始的操作,如上buff
     def stage_start(self):
@@ -244,10 +256,11 @@ class DnfArbitratorRole006(DnfArbitratorCommonRole, ABC):
         self.press_key(key_list=['y'], back_swing=8)
 
 
-class DnfArbitratorRole007(DnfArbitratorCommonRole, ABC):
+class zhanfa(DnfArbitratorCommonRole, ABC):
     def __init__(self):
         super().__init__()
-        self.role_name = 'r7_zhanfa'
+        self.left = 2 / 8
+        self.top = 2 / 3
 
     # 关卡开始的操作,如上buff
     def stage_start(self):
@@ -268,14 +281,23 @@ class DnfArbitratorRole007(DnfArbitratorCommonRole, ABC):
 
 # 角色配置
 ALL_ROLE_CONFIG = [
-    {"role_agent": DnfArbitratorRole001(), "left": 2 / 8, "top": 1 / 3, "status": "todo", },
-    {"role_agent": DnfArbitratorRole002(), "left": 3 / 8, "top": 1 / 3, "status": "todo", },
-    {"role_agent": DnfArbitratorRole003(), "left": 4 / 8, "top": 1 / 3, "status": "todo", },
-    {"role_agent": DnfArbitratorRole004(), "left": 5 / 8, "top": 1 / 3, "status": "todo", },
-    {"role_agent": DnfArbitratorRole005(), "left": 6 / 8, "top": 1 / 3, "status": "todo", },
-    {"role_agent": DnfArbitratorRole006(), "left": 1 / 8, "top": 2 / 3, "status": "todo", },
-    {"role_agent": DnfArbitratorRole007(), "left": 2 / 8, "top": 2 / 3, "status": "todo", },
+    {"role_class": "modao", "role_status": "todo", },
+    {"role_class": "naima01", "role_status": "todo", },
+    {"role_class": "nailuo", "role_status": "todo", },
+    {"role_class": "naima02", "role_status": "todo", },
+    {"role_class": "zhaohuan", "role_status": "todo", },
+    {"role_class": "saber", "role_status": "todo", },
+    {"role_class": "zhanfa", "role_status": "todo", },
 ]
+
+
+def role_status_cmp(a, b):
+    d = {
+        'doing': 1,
+        'todo': 2,
+        'done': 3,
+    }
+    return d[a['role_status']] - d[b['role_status']]
 
 
 def play():
@@ -289,19 +311,42 @@ def play():
     time.sleep(3)
 
     # 开启大写锁定,防止输入法干扰
-    direct_press_key(key_list=['capslock'], back_swing=0.1)
+    # direct_press_key(key_list=['capslock'], back_swing=0.1)
 
-    for one_role_config in ALL_ROLE_CONFIG:
+    # 从redis中读取角色配置
+    redis_key = "ALL_ROLE_STATUS_" + time.strftime("%Y-%m-%d", time.localtime())
+    redis_val = redis_conn.get(redis_key)
+    if redis_val is None:
+        redis_val = json.dumps(ALL_ROLE_CONFIG)
+        redis_conn.set(name=redis_key, value=redis_val)
+    all_role_config: list = json.loads(redis_val)
+    # 排序,按照doing,to do,done的顺序来排序
+    all_role_config = sorted(all_role_config, key=functools.cmp_to_key(role_status_cmp))
+    print("*" * 50, "ALL_ROLE_STATUS start", "*" * 50)
+    for i in all_role_config:
+        print(i)
+    print("*" * 50, "ALL_ROLE_STATUS end", "*" * 50)
+
+    for one_role_config in all_role_config:
+        role_class = one_role_config['role_class']
+        role_status = one_role_config['role_status']
+        if role_status == 'done':
+            # 已刷过图的角色就不需要处理了
+            continue
+
         # 到选择角色界面
         to_ui_role_select()
         time.sleep(5)
+
+        # 创建对应的角色
+        role_class_obj: DnfArbitratorCommonRole = eval(role_class)()
 
         # 切换成对应角色
         window_left, window_top, window_right, window_bottom = get_window_rect(window_hwnd)
         window_width = window_right - window_left
         window_height = window_bottom - window_top
-        role_x = int(window_left + window_width * one_role_config['left'])
-        role_y = int(window_top + window_height * one_role_config['top'])
+        role_x = int(window_left + window_width * role_class_obj.left)
+        role_y = int(window_top + window_height * role_class_obj.top)
         pyautogui.moveTo(x=role_x, y=role_y)
         mouse_left_double_click()
         time.sleep(5)
@@ -309,17 +354,22 @@ def play():
         # 判断是否有疲劳
         has_no_point = has_no_fatigue_point()
         if has_no_point:
-            one_role_config['status'] = "done"
+            # 更新角色状态,并保存到redis
+            one_role_config['role_status'] = "done"
+            redis_conn.set(name=redis_key, value=json.dumps(all_role_config))
             continue
 
         move_to_arbitrator()
 
-        role_agent: DnfArbitratorCommonRole = one_role_config['role_agent']
-        print(f"role [{role_agent.role_name}] play start")
+        print(f"role [{role_class_obj.role_name}] play start")
         play_start_time = time.time()
-        role_agent.role_play()
+        role_class_obj.role_play()
         play_cost_time = time.time() - play_start_time
-        print(f"role [{role_agent.role_name}] play end, play total cost [{play_cost_time:.2f}] s")
+        print(f"role [{role_class_obj.role_name}] play end, play total cost [{play_cost_time:.2f}] s")
+
+        # 更新角色状态,并保存到redis
+        one_role_config['role_status'] = "done"
+        redis_conn.set(name=redis_key, value=json.dumps(all_role_config))
 
 
 if __name__ == '__main__':

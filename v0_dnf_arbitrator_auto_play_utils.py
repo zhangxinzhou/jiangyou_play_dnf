@@ -8,8 +8,47 @@ import pydirectinput
 import win32api
 import win32con
 import win32gui
-
+from pynput import keyboard
 from constants import *
+
+# 退出
+program_exit = False
+# 暂停
+program_pause = False
+
+
+# 退出和暂停功能的实现
+def on_press(key):
+    global program_exit
+    global program_pause
+    if key == keyboard.Key.f4:
+        program_exit = True
+        print(f"you press key [{key}], program will exit after a few seconds.")
+
+    elif key == keyboard.Key.f3:
+        program_pause = not program_pause
+        if program_pause:
+            print(f"you press key [{key}], program will pause after a few seconds.")
+        else:
+            print(f"you press key [{key}], program will resume after a few seconds.")
+
+
+listener = keyboard.Listener(on_press=on_press)
+listener.start()
+
+
+def hand_exit_and_pause():
+    global program_exit
+    global program_pause
+    if program_exit:
+        print("program exit.")
+        sys.exit(-1)
+    while program_pause:
+        if program_exit:
+            print("program exit.")
+            sys.exit(-1)
+        print("program pause...")
+        time.sleep(1)
 
 
 def direct_press_key(key_list: list, duration=0.0, back_swing=0.0) -> None:
@@ -19,6 +58,8 @@ def direct_press_key(key_list: list, duration=0.0, back_swing=0.0) -> None:
     :param back_swing: 技能后摇时间,单位秒
     :return:
     """
+    hand_exit_and_pause()
+
     key_list_len = len(key_list)
     if key_list_len <= 0:
         raise Exception("key_list must not be empty!")
@@ -38,6 +79,8 @@ def direct_press_key(key_list: list, duration=0.0, back_swing=0.0) -> None:
 
 
 def mouse_left_click() -> None:
+    hand_exit_and_pause()
+
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 100, 100)
     time.sleep(0.1)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 100, 100)
@@ -45,6 +88,8 @@ def mouse_left_click() -> None:
 
 
 def mouse_left_double_click() -> None:
+    hand_exit_and_pause()
+
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 100, 100)
     time.sleep(0.1)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 100, 100)
@@ -56,6 +101,8 @@ def mouse_left_double_click() -> None:
 
 
 def mouse_right_click() -> None:
+    hand_exit_and_pause()
+
     win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, 100, 100)
     time.sleep(0.1)
     win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, 100, 100)
