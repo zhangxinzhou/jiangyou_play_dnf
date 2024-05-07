@@ -51,7 +51,8 @@ if __name__ == '__main__':
         print(f"can not find game [{window_title}]")
         exit(-1)
     print('start loading model')
-    model = YOLO('yolov8s.pt')
+    model_path = r"runs/detect/train/weights/best.pt"
+    model = YOLO(model_path)
     print('end loading model')
 
     labels_list = []
