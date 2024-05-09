@@ -35,9 +35,9 @@ class DnfArbitratorCommonRole(metaclass=ABCMeta):
         # 周四打副本要留疲劳,周三要领深渊门票
         day_of_week = 1 + datetime.now().weekday()
         if day_of_week == 3:
-            self.max_round = 20
+            self.max_round = 4
         elif day_of_week == 4:
-            self.max_round = 40
+            self.max_round = 4
 
     def role_run(self, key='right', duration=2):
         self.press_key(key_list=[key, key], duration=duration)
@@ -78,9 +78,8 @@ class DnfArbitratorCommonRole(metaclass=ABCMeta):
 
     def role_play(self) -> bool:
         while self.has_fatigue_point:
-            if self.round >= self.max_round:
+            if self.round + 1 >= self.max_round:
                 self.has_fatigue_point = False
-                break
             self.round += 1
             print(f'role [{self.role_name}], round [{self.round:>2}/{self.max_round:>2}] start')
             self.stage_start()
@@ -237,6 +236,13 @@ class saber(DnfArbitratorCommonRole, ABC):
         self.left = 1 / 8
         self.top = 2 / 3
 
+        # 周四打副本要留疲劳,周三要领深渊门票
+        day_of_week = 1 + datetime.now().weekday()
+        if day_of_week == 3:
+            self.max_round = 10
+        elif day_of_week == 4:
+            self.max_round = 10
+
     # 关卡开始的操作,如上buff
     def stage_start(self):
         self.press_key(key_list=['q', 'left'], back_swing=0.1)
@@ -262,6 +268,13 @@ class zhanfa(DnfArbitratorCommonRole, ABC):
         self.left = 2 / 8
         self.top = 2 / 3
 
+        # 周四打副本要留疲劳,周三要领深渊门票
+        day_of_week = 1 + datetime.now().weekday()
+        if day_of_week == 3:
+            self.max_round = 10
+        elif day_of_week == 4:
+            self.max_round = 10
+
     # 关卡开始的操作,如上buff
     def stage_start(self):
         self.press_key(key_list=['right', 'right', 'space'], back_swing=0.5)
@@ -270,7 +283,7 @@ class zhanfa(DnfArbitratorCommonRole, ABC):
 
     def stage_clear(self):
         self.role_run()
-        self.press_key(key_list=['g'], duration=0.8, back_swing=1)
+        self.press_key(key_list=['e'], duration=0.8, back_swing=1)
 
         self.role_run()
         self.press_key(key_list=['h'], duration=1, back_swing=1)

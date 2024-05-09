@@ -87,9 +87,8 @@ class DnfArbitratorCommonRole(metaclass=ABCMeta):
 
     def role_play(self) -> bool:
         while self.has_fatigue_point:
-            if self.round >= self.max_round:
+            if self.round + 1 >= self.max_round:
                 self.has_fatigue_point = False
-                break
             self.round += 1
             print(f'role [{self.role_name}], round [{self.round:>2}/{self.max_round:>2}] start')
             self.stage_start()

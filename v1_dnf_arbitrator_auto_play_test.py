@@ -33,11 +33,11 @@ class PlayTest(unittest.TestCase):
 
     def test_init_redis_val(self):
         ALL_ROLE_CONFIG = [
-            {"role_class": "modao", "role_status": "done", },
-            {"role_class": "naima01", "role_status": "done", },
-            {"role_class": "nailuo", "role_status": "done", },
-            {"role_class": "naima02", "role_status": "done", },
-            {"role_class": "zhaohuan", "role_status": "done", },
+            {"role_class": "modao", "role_status": "todo", },
+            {"role_class": "naima01", "role_status": "todo", },
+            {"role_class": "nailuo", "role_status": "todo", },
+            {"role_class": "naima02", "role_status": "todo", },
+            {"role_class": "zhaohuan", "role_status": "todo", },
             {"role_class": "saber", "role_status": "todo", },
             {"role_class": "zhanfa", "role_status": "todo", },
         ]
