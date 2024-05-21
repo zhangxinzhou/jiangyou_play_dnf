@@ -31,6 +31,10 @@ class PlayTest(unittest.TestCase):
         role = zhanfa()
         role.role_play()
 
+    def test_del_redis_val(self):
+        redis_key = "ALL_ROLE_STATUS_" + time.strftime("%Y-%m-%d", time.localtime())
+        redis_conn.delete(redis_key)
+
     def test_init_redis_val(self):
         ALL_ROLE_CONFIG = [
             {"role_class": "modao", "role_status": "done", },

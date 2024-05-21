@@ -1,0 +1,24 @@
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+# COCO128 dataset https://www.kaggle.com/ultralytics/coco128 (first 128 images from COCO xxx2017) by Ultralytics
+# Documentation: https://docs.ultralytics.com/datasets/detect/coco/
+# Example usage: yolo train data=_datasets_dnf_arbitrator.yaml
+# parent
+# ├── ultralytics
+# └── datasets
+#     └── coco128  ← downloads here (7 MB)
+
+# Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
+path: D:\repository\git\jiangyou_play_dnf\datasets\dnf_arbitrator # dataset root dir
+# path: ../datasets/dnf_arbitrator # dataset root dir
+train: images
+val: images
+test: # test images (optional)
+
+# Classes
+names:
+  0: role
+  1: arrow
+  2: monster_1
+  3: monster_2
+  4: boss_box
+  5: stage_clear

@@ -35,7 +35,7 @@ class DnfArbitratorCommonRole(metaclass=ABCMeta):
         # 周四打副本要留疲劳,周三要领深渊门票
         day_of_week = 1 + datetime.now().weekday()
         if day_of_week == 3:
-            self.max_round = 4
+            self.max_round = 20
         elif day_of_week == 4:
             self.max_round = 4
 
@@ -115,7 +115,7 @@ class modao(DnfArbitratorCommonRole, ABC):
         self.role_run()
         self.press_key(key_list=['w'], back_swing=0.1)
 
-        self.role_run(duration=3)
+        self.role_run(duration=3.5)
 
         time.sleep(10)
 
@@ -173,7 +173,7 @@ class nailuo(DnfArbitratorCommonRole, ABC):
 
         self.role_run(duration=1)
         self.press_key(key_list=['a'], back_swing=1)
-        self.press_key(key_list=['ctrl'], back_swing=10)
+        self.press_key(key_list=['y'], back_swing=10)
 
 
 class naima02(DnfArbitratorCommonRole, ABC):

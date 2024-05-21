@@ -10,16 +10,13 @@ if __name__ == '__main__':
     # Load a pretrained YOLO model (recommended for training)
     model = YOLO('yolov8n.pt')
 
-    # Train the model using the 'coco128.yaml' dataset for 3 epochs
-    results = model.train(data='coco128.yaml', epochs=3)
+    yaml_path = '_datasets_dnf_arbitrator.yaml'
+    results = model.train(data=yaml_path, epochs=100)
+    print("*" * 100)
+    print(results)
 
     # Evaluate the model's performance on the validation set
     results = model.val()
 
-    # Perform object detection on an image using the model
-    results = model('dnf.png')
-
-    # Export the model to ONNX format
-    success = model.export(format='onnx')
     print("*" * 100)
-    print(success)
+    print(results)
