@@ -1,5 +1,6 @@
 import functools
 import json
+import time
 from abc import ABCMeta, abstractmethod, ABC
 from datetime import datetime
 
@@ -20,6 +21,8 @@ pydirectinput.PAUSE = 0.1
 class DnfArbitratorCommonRole(metaclass=ABCMeta):
     def __init__(self):
         super().__init__()
+        self.labels_detail_dict: dict = None
+        self.labels_exists_dict: dict = None
         self.role_name = self.__class__.__name__
         # 选择角色的位置
         self.left = None
@@ -72,19 +75,45 @@ class DnfArbitratorCommonRole(metaclass=ABCMeta):
             self.has_fatigue_point = False
         else:
             # 再次挑战,然后等待5秒
-            self.press_key(key_list=['f10'], back_swing=5)
+            self.press_key(key_list=['f10'], back_swing=1)
             self.has_fatigue_point = True
+
+    def get_labels_exists_dict(self):
+        self.labels_exists_dict: dict = json.loads(redis_conn.get('labels_exists_dict'))
+        return self.labels_exists_dict
+
+    def get_labels_detail_dict(self):
+        self.labels_detail_dict: dict = json.loads(redis_conn.get('labels_detail_dict'))
+        return self.labels_detail_dict
 
     def role_play(self) -> bool:
         while self.has_fatigue_point:
-            if self.round >= self.max_round:
+            if self.round + 1 >= self.max_round:
                 self.has_fatigue_point = False
-                break
             self.round += 1
             print(f'role [{self.role_name}], round [{self.round:>2}/{self.max_round:>2}] start')
+            # 第一次看到箭头,说明关卡加载完毕,开始上buff
+            while not self.get_labels_exists_dict().get('arrow', 0) > 0.5:
+                time.sleep(0.1)
             self.stage_start()
+
+            # 跑步
+            # while not self.get_labels_exists_dict().get('arrow',0) > 0.5:
+            #     self.role_run()
+
+            # 请第一波小怪
+            # 跑步过场景
+            # 请第二波小怪
+            # 看见boss放大招
+            # 看见stage_clear,开始捡东西
+
+            # 老方法清怪清boss的方法
             self.stage_clear()
+            # 老过关方法
+            while not self.get_labels_exists_dict().get('stage_clear', 0) > 0.5:
+                time.sleep(0.3)
             self.stage_end()
+
             round_cost = time.time() - self.round_time
             total_cost = time.time() - self.total_time
             self.round_time = time.time()
@@ -107,17 +136,13 @@ class modao(DnfArbitratorCommonRole, ABC):
 
         self.press_key(key_list=['up', 'up', 'space'], back_swing=0.5)
 
-        self.press_key(key_list=['down', 'up', 'space'], back_swing=0.1)
-
         self.press_key(key_list=['down'], duration=0.3, back_swing=0.1)
 
     def stage_clear(self):
         self.role_run()
         self.press_key(key_list=['w'], back_swing=0.1)
 
-        self.role_run(duration=3)
-
-        time.sleep(10)
+        self.role_run(duration=3.5)
 
 
 # 角色002
@@ -146,7 +171,7 @@ class naima01(DnfArbitratorCommonRole, ABC):
         self.press_key(key_list=['s'], back_swing=0.8)
 
         self.role_run(duration=1)
-        self.press_key(key_list=['q', 'a'], back_swing=5)
+        self.press_key(key_list=['q', 'a'], back_swing=1)
 
 
 class nailuo(DnfArbitratorCommonRole, ABC):
@@ -173,7 +198,7 @@ class nailuo(DnfArbitratorCommonRole, ABC):
 
         self.role_run(duration=1)
         self.press_key(key_list=['a'], back_swing=1)
-        self.press_key(key_list=['ctrl'], back_swing=10)
+        self.press_key(key_list=['h'], back_swing=1)
 
 
 class naima02(DnfArbitratorCommonRole, ABC):
@@ -201,7 +226,7 @@ class naima02(DnfArbitratorCommonRole, ABC):
         self.press_key(key_list=['s'], back_swing=0.8)
 
         self.role_run(duration=1.5)
-        self.press_key(key_list=['q', 'a'], back_swing=5)
+        self.press_key(key_list=['q', 'a'], back_swing=1)
 
 
 class zhaohuan(DnfArbitratorCommonRole, ABC):
@@ -226,7 +251,7 @@ class zhaohuan(DnfArbitratorCommonRole, ABC):
     def stage_clear(self):
         self.role_run(duration=8)
 
-        self.press_key(key_list=['y'], back_swing=8)
+        self.press_key(key_list=['y'], back_swing=1)
 
 
 class saber(DnfArbitratorCommonRole, ABC):
@@ -252,7 +277,7 @@ class saber(DnfArbitratorCommonRole, ABC):
         self.press_key(key_list=['f'], duration=1, back_swing=0.5)
 
         self.role_run()
-        self.press_key(key_list=['y'], back_swing=8)
+        self.press_key(key_list=['y'], back_swing=1)
 
 
 class zhanfa(DnfArbitratorCommonRole, ABC):
@@ -275,7 +300,7 @@ class zhanfa(DnfArbitratorCommonRole, ABC):
         self.press_key(key_list=['h'], duration=1, back_swing=1)
 
         self.role_run()
-        self.press_key(key_list=['t'], back_swing=8)
+        self.press_key(key_list=['t'], back_swing=1)
 
 
 # 角色配置

@@ -54,3 +54,8 @@ class PlayTest(unittest.TestCase):
         l = json.loads(redis_val)
         for i in l:
             print(i)
+
+    def test_get_labels_list(self):
+        labels_list: list = json.loads(redis_conn.get('labels_list'))
+        for i in labels_list:
+            print(i)

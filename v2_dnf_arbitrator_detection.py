@@ -7,8 +7,8 @@ import time
 import cv2
 import numpy as np
 import redis
-import supervision as sv
 import win32gui
+import supervision as sv
 from PyQt5.QtGui import QImage
 from PyQt5.QtWidgets import QApplication
 from ultralytics import YOLO
@@ -55,8 +55,11 @@ if __name__ == '__main__':
     model = YOLO(model_path)
     print('end loading model')
 
-    labels_list = []
-    labels_max_len = 10
+    last_n_label_max_size = 10
+    last_n_label_list = []
+    # 最近n个预测结果
+    last_n_result_max_size = 3
+    last_n_result_list = []
     prev_time = time.time()
     while True:
         cost_time = time.time() - prev_time
@@ -64,28 +67,75 @@ if __name__ == '__main__':
 
         q_image = _screen.grabWindow(window_hwnd).toImage()
         cv2_mat = q_image_to_cv2_mat(q_image)
+        img_shape = cv2_mat.shape
+        height = img_shape[0]
+        width = img_shape[1]
 
         # 渲染模型预测结果
         results = model.predict(cv2_mat)
+
+        # 因为一次只有一张图片,所以就只有只返回一个results只有一个
         result = results[0]
         detections = sv.Detections.from_ultralytics(result)
-
         labels = [model.model.names[class_id] for class_id in detections.class_id]
-        # 将labels放入redis
-        if len(labels_list) >= labels_max_len:
-            labels_list.pop(0)
-        labels_list.append(labels)
-        json_str = json.dumps(labels_list)
-        redis_conn.set(name='labels_list', value=json_str)
+        if len(last_n_label_list) > last_n_label_max_size:
+            last_n_label_list.pop(0)
+        last_n_label_list.append(set(labels))
+        last_n_label_list_size = len(last_n_label_list)
+        label_rate_dict = {}
+        tmp_dict = {}
+        for i in last_n_label_list:
+            for j in i:
+                count = tmp_dict.get(j, 0)
+                count += 1
+                tmp_dict[j] = count
+        set_all = label_rate_dict.keys() | tmp_dict.keys()
+        for k in set_all:
+            count = tmp_dict.get(k, 0)
+            rate = count / last_n_label_list_size
+            label_rate_dict[k] = rate
+            print(k, rate)
+        # 存在概率
+        redis_conn.set(name='labels_exists_dict', value=json.dumps(label_rate_dict))
+
+        if len(labels) > 0:
+            result_json_obj = json.loads(result.tojson())
+            # 每个分类中找出一个概率最大的即可
+            last_n_result_list_size = len(last_n_result_list)
+            if last_n_result_list_size > last_n_result_max_size:
+                last_n_result_list.pop(0)
+            last_n_result_list.append(result_json_obj)
+
+            label_dict = {}
+            for i in last_n_result_list:
+                for j in i:
+                    label_name = j['name']
+                    label_prob = j['confidence']
+                    label_box = j['box']
+                    label_box_x_center = int((label_box['x1'] + label_box['x2']) / 2)
+                    label_box_y_center = int((label_box['y1'] + label_box['y2']) / 2)
+                    label_box_center = [label_box_x_center, label_box_y_center]
+                    prev_label_prob = 0
+                    if label_prob > label_dict.get(label_name, {}).get(label_prob, 0):
+                        if label_dict.get(label_name) is None:
+                            label_dict[label_name] = {}
+                        label_dict[label_name]['label_name'] = label_name
+                        label_dict[label_name]['label_prob'] = label_prob
+                        label_dict[label_name]['label_box'] = label_box
+                        label_dict[label_name]['label_box_center'] = label_box_center
+
+            redis_conn.set(name='labels_detail_dict', value=json.dumps(label_dict))
+            for k, v in label_dict.items():
+                print(k, v)
+                # 画出坐标
+                x, y = v['label_box_center']
+                cv2.line(cv2_mat, pt1=(x, y - 100), pt2=(x, y + 100), color=(0, 0, 255), thickness=3)
+                cv2.line(cv2_mat, pt1=(x - 100, y), pt2=(x + 100, y), color=(0, 0, 255), thickness=3)
+                # cv2.putText(cv2_mat, text='+', org=(x, y), fontFace=cv2.FONT_HERSHEY_COMPLEX, fontScale=0.5,color=(0, 0, 255))
 
         # 需要查看监测的结果,就将show_window改为True
         show_window = True
         if show_window:
-            bounding_box_annotator = sv.BoundingBoxAnnotator()
-            label_annotator = sv.LabelAnnotator()
-            annotated_image = bounding_box_annotator.annotate(scene=cv2_mat, detections=detections)
-            annotated_image = label_annotator.annotate(scene=annotated_image, detections=detections, labels=labels)
-
             left, top, right, bottom = get_window_rect(window_hwnd)
 
             # 左上角显示窗口相关信息
@@ -94,7 +144,8 @@ if __name__ == '__main__':
             text = cost_text + rect_text
             cv2.putText(cv2_mat, text=text, org=(20, 20), fontFace=cv2.FONT_HERSHEY_COMPLEX, fontScale=0.5,
                         color=(0, 0, 255))
-            cv2.imshow('game_screen', cv2_mat)
+            # cv2.imshow('game_screen', cv2_mat)
+            cv2.imshow("YOLOv8 Inference", result.plot())
             key = cv2.waitKey(1)
 
             if key != -1:
