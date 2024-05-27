@@ -50,7 +50,9 @@ class DnfArbitratorCommonRole(metaclass=ABCMeta):
     # 关卡开始的操作,如上buff
     @abstractmethod
     def stage_start(self):
-        pass
+        # 第一次看到箭头,说明关卡加载完毕,开始上buff
+        while not self.get_labels_exists_dict().get('arrow', 0) > 0.5:
+            time.sleep(0.1)
 
     @abstractmethod
     def stage_clear(self):
@@ -58,6 +60,9 @@ class DnfArbitratorCommonRole(metaclass=ABCMeta):
 
     # 关卡结束时的操作,如维修武器
     def stage_end(self) -> bool:
+        # 出现stage_clear时,再执行后续操作
+        while not self.get_labels_exists_dict().get('stage_clear', 0) > 0.5:
+            time.sleep(0.3)
         # 维修武器
         self.press_key(key_list=['s', 'space'], back_swing=0.1)
         # 数字0 移动物品 捡东西
@@ -92,26 +97,8 @@ class DnfArbitratorCommonRole(metaclass=ABCMeta):
                 self.has_fatigue_point = False
             self.round += 1
             print(f'role [{self.role_name}], round [{self.round:>2}/{self.max_round:>2}] start')
-            # 第一次看到箭头,说明关卡加载完毕,开始上buff
-            while not self.get_labels_exists_dict().get('arrow', 0) > 0.5:
-                time.sleep(0.1)
             self.stage_start()
-
-            # 跑步
-            # while not self.get_labels_exists_dict().get('arrow',0) > 0.5:
-            #     self.role_run()
-
-            # 请第一波小怪
-            # 跑步过场景
-            # 请第二波小怪
-            # 看见boss放大招
-            # 看见stage_clear,开始捡东西
-
-            # 老方法清怪清boss的方法
             self.stage_clear()
-            # 老过关方法
-            while not self.get_labels_exists_dict().get('stage_clear', 0) > 0.5:
-                time.sleep(0.3)
             self.stage_end()
 
             round_cost = time.time() - self.round_time
@@ -132,6 +119,7 @@ class modao(DnfArbitratorCommonRole, ABC):
 
     # 关卡开始的操作,如上buff
     def stage_start(self):
+        super().stage_start()
         self.press_key(key_list=['up', 'right', 'space'], back_swing=0.1)
 
         self.press_key(key_list=['up', 'up', 'space'], back_swing=0.5)
@@ -155,6 +143,7 @@ class naima01(DnfArbitratorCommonRole, ABC):
 
     # 关卡开始的操作,如上buff
     def stage_start(self):
+        super().stage_start()
         self.press_key(key_list=['right', 'right', 'space'], back_swing=0.1)
 
         self.press_key(key_list=['up', 'up', 'space'], back_swing=0.1)
@@ -183,6 +172,7 @@ class nailuo(DnfArbitratorCommonRole, ABC):
 
     # 关卡开始的操作,如上buff
     def stage_start(self):
+        super().stage_start()
         self.press_key(key_list=['right', 'right', 'space'], back_swing=1)
 
         self.press_key(key_list=['up', 'up', 'space'], back_swing=0.5)
@@ -210,6 +200,7 @@ class naima02(DnfArbitratorCommonRole, ABC):
 
     # 关卡开始的操作,如上buff
     def stage_start(self):
+        super().stage_start()
         self.press_key(key_list=['right', 'right', 'space'], back_swing=0.1)
 
         self.press_key(key_list=['up', 'up', 'space'], back_swing=0.1)
@@ -238,6 +229,7 @@ class zhaohuan(DnfArbitratorCommonRole, ABC):
 
     # 关卡开始的操作,如上buff
     def stage_start(self):
+        super().stage_start()
         self.press_key(key_list=['q'], back_swing=2)
 
         self.press_key(key_list=['r'], back_swing=0.5)
@@ -263,6 +255,7 @@ class saber(DnfArbitratorCommonRole, ABC):
 
     # 关卡开始的操作,如上buff
     def stage_start(self):
+        super().stage_start()
         self.press_key(key_list=['q', 'left'], back_swing=0.1)
 
         self.press_key(key_list=['right', 'right', 'space'], back_swing=0.5)
@@ -288,6 +281,7 @@ class zhanfa(DnfArbitratorCommonRole, ABC):
 
     # 关卡开始的操作,如上buff
     def stage_start(self):
+        super().stage_start()
         self.press_key(key_list=['right', 'right', 'space'], back_swing=0.5)
 
         self.press_key(key_list=['r'], duration=2, back_swing=0.1)
@@ -360,7 +354,7 @@ def play():
 
         # 到选择角色界面
         to_ui_role_select()
-        time.sleep(5)
+        time.sleep(1)
 
         # 创建对应的角色
         role_class_obj: DnfArbitratorCommonRole = eval(role_class)()
