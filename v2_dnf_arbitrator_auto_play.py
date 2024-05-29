@@ -130,7 +130,7 @@ class modao(DnfArbitratorCommonRole, ABC):
         self.role_run()
         self.press_key(key_list=['w'], back_swing=0.1)
 
-        self.role_run(duration=3.5)
+        self.role_run(duration=4)
 
 
 # 角色002
@@ -294,7 +294,7 @@ class zhanfa(DnfArbitratorCommonRole, ABC):
         self.press_key(key_list=['h'], duration=1, back_swing=1)
 
         self.role_run()
-        self.press_key(key_list=['t'], back_swing=1)
+        self.press_key(key_list=['ctrl'], back_swing=1)
 
 
 # 角色配置
