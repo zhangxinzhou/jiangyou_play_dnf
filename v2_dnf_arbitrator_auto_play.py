@@ -68,7 +68,7 @@ class DnfArbitratorCommonRole(metaclass=ABCMeta):
         # 数字0 移动物品 捡东西
         self.press_key(key_list=['0'], back_swing=0.5)
         # 捡东西
-        for _i in range(15):
+        for _i in range(20):
             self.press_key(key_list=['x'])
         # 关闭维修商店
         self.press_key(key_list=['esc'], back_swing=0.5)
@@ -288,13 +288,13 @@ class zhanfa(DnfArbitratorCommonRole, ABC):
 
     def stage_clear(self):
         self.role_run()
-        self.press_key(key_list=['g'], duration=0.8, back_swing=1)
+        self.press_key(key_list=['e'], duration=0.8, back_swing=1)
 
         self.role_run()
         self.press_key(key_list=['h'], duration=1, back_swing=1)
 
         self.role_run()
-        self.press_key(key_list=['ctrl'], back_swing=1)
+        self.press_key(key_list=['t'], back_swing=1)
 
 
 # 角色配置
