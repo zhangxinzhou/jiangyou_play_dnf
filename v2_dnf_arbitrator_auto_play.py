@@ -29,7 +29,7 @@ class DnfArbitratorCommonRole(metaclass=ABCMeta):
         self.top = None
         self.press_key = direct_press_key
         self.round = 0
-        self.max_round = 20
+        self.max_round = 4
         self.round_time = time.time()
         self.total_time = time.time()
         self.has_fatigue_point = True
@@ -37,9 +37,9 @@ class DnfArbitratorCommonRole(metaclass=ABCMeta):
         # 周四打副本要留疲劳,周三要领深渊门票
         day_of_week = 1 + datetime.now().weekday()
         if day_of_week == 3:
-            self.max_round = 20
+            self.max_round = 4
         elif day_of_week == 4:
-            self.max_round = 40
+            self.max_round = 4
 
     def role_run(self, key='right', duration=2):
         self.press_key(key_list=[key, key], duration=duration)
@@ -293,8 +293,8 @@ class zhanfa(DnfArbitratorCommonRole, ABC):
         self.role_run()
         self.press_key(key_list=['h'], duration=1, back_swing=1)
 
-        self.role_run()
-        self.press_key(key_list=['t'], back_swing=1)
+        self.role_run(duration=0.5)
+        self.press_key(key_list=['y'], back_swing=1)
 
 
 # 角色配置

@@ -12,6 +12,7 @@ import supervision as sv
 from PyQt5.QtGui import QImage
 from PyQt5.QtWidgets import QApplication
 from ultralytics import YOLO
+import v3_all_role_config
 
 # 游戏窗口截图所需
 _app = QApplication(sys.argv)
@@ -53,6 +54,31 @@ def show_mouse_position(_event, _x, _y, _flags, _params):
     global mouse_y
     mouse_x = _x
     mouse_y = _y
+
+
+COLOR_RED = (0, 0, 255)
+COLOR_GREEN = (0, 255, 0)
+
+
+# 判断技能是否可用的方法
+def hand_skill(_cv2_mat):
+    _x1 = v3_all_role_config.SKILL_BOX_X1
+    _x2 = v3_all_role_config.SKILL_BOX_X2
+    _y1 = v3_all_role_config.SKILL_BOX_Y1
+    _y2 = v3_all_role_config.SKILL_BOX_Y2
+    # 具体技能
+    for _skill_key, _skill_xy in v3_all_role_config.SKILL_ICON_LOCATION.items():
+        _pt1, _pt2 = _skill_xy
+        _pt1_x, _pt1_y = _pt1
+        _pt2_x, _pt2_y = _pt2
+        # 判断技能是否可用
+        _skill_icon = _cv2_mat[_pt1_y:_pt2_y, _pt1_x:_pt2_x]
+        cv2.imwrite(f'_skill_{_skill_key}.jpg', _skill_icon)
+        # cv2.putText(_cv2_mat, text=_skill_key, org=(_pt1_x + 15, _pt1_y + 15),
+        # fontFace=cv2.FONT_HERSHEY_COMPLEX, fontScale=0.5, color=COLOR_RED)
+        cv2.rectangle(_cv2_mat, _pt1, _pt2, color=COLOR_RED, thickness=1)
+    # 整个技能框
+    cv2.rectangle(_cv2_mat, (_x1 - 1, _y1 - 1), (_x2 + 1, _y2 + 1), color=COLOR_GREEN, thickness=1)
 
 
 if __name__ == '__main__':
@@ -161,6 +187,7 @@ if __name__ == '__main__':
             position_txt = f'x=[{mouse_x:>4}] y=[{mouse_y:>4}] color=[{cv2_mat[mouse_y][mouse_x]}]'
             cv2.putText(cv2_mat, text=position_txt, org=(20, 20 + 40), fontFace=cv2.FONT_HERSHEY_COMPLEX, fontScale=0.5,
                         color=(0, 0, 255))
+            hand_skill(cv2_mat)
             cv2.imshow(window_name, result.plot())
             key = cv2.waitKey(1)
 

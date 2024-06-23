@@ -14,22 +14,22 @@ from pynput import keyboard
 from constants import *
 
 # 退出
-program_exit = False
+PROGRAM_EXIT = False
 # 暂停
-program_pause = False
+PROGRAM_PAUSE = False
 
 
 # 退出和暂停功能的实现
 def on_press(key):
-    global program_exit
-    global program_pause
+    global PROGRAM_EXIT
+    global PROGRAM_PAUSE
     if key == keyboard.Key.f4:
         program_exit = True
         print(f"you press key [{key}], program will exit after a few seconds.")
 
     elif key == keyboard.Key.f3:
-        program_pause = not program_pause
-        if program_pause:
+        PROGRAM_PAUSE = not PROGRAM_PAUSE
+        if PROGRAM_PAUSE:
             print(f"you press key [{key}], program will pause after a few seconds.")
         else:
             print(f"you press key [{key}], program will resume after a few seconds.")
@@ -45,13 +45,13 @@ redis_conn = redis.Redis(connection_pool=redis_pool)
 
 
 def hand_exit_and_pause():
-    global program_exit
-    global program_pause
-    if program_exit:
+    global PROGRAM_EXIT
+    global PROGRAM_PAUSE
+    if PROGRAM_EXIT:
         print("program exit.")
         sys.exit(-1)
-    while program_pause:
-        if program_exit:
+    while PROGRAM_PAUSE:
+        if PROGRAM_EXIT:
             print("program exit.")
             sys.exit(-1)
         print("program pause...")
