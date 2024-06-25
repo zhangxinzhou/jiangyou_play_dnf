@@ -1,5 +1,6 @@
 *.pt
 *.txt
 *.xlsx
+*.jpg
 /runs/
 /datasets/

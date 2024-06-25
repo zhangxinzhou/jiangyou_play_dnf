@@ -62,15 +62,14 @@ COLOR_GREEN = (0, 255, 0)
 
 # 判断技能是否可用的方法
 def hand_skill(_cv2_mat):
-    _x1 = v3_all_role_config.SKILL_BOX_X1
-    _x2 = v3_all_role_config.SKILL_BOX_X2
-    _y1 = v3_all_role_config.SKILL_BOX_Y1
-    _y2 = v3_all_role_config.SKILL_BOX_Y2
+    _box_x1 = v3_all_role_config.SKILL_BOX_X1
+    _box_x2 = v3_all_role_config.SKILL_BOX_X2
+    _box_y1 = v3_all_role_config.SKILL_BOX_Y1
+    _box_y2 = v3_all_role_config.SKILL_BOX_Y2
     # 具体技能
     for _skill_key, _skill_xy in v3_all_role_config.SKILL_ICON_LOCATION.items():
-        _pt1, _pt2 = _skill_xy
-        _pt1_x, _pt1_y = _pt1
-        _pt2_x, _pt2_y = _pt2
+        _pt1_x, _pt1_y, _pt2_x, _pt2_y = _skill_xy
+        _pt1, _pt2 = (_pt1_x, _pt1_y), (_pt2_x, _pt2_y)
         # 判断技能是否可用
         _skill_icon = _cv2_mat[_pt1_y:_pt2_y, _pt1_x:_pt2_x]
         cv2.imwrite(f'_skill_{_skill_key}.jpg', _skill_icon)
@@ -78,7 +77,7 @@ def hand_skill(_cv2_mat):
         # fontFace=cv2.FONT_HERSHEY_COMPLEX, fontScale=0.5, color=COLOR_RED)
         cv2.rectangle(_cv2_mat, _pt1, _pt2, color=COLOR_RED, thickness=1)
     # 整个技能框
-    cv2.rectangle(_cv2_mat, (_x1 - 1, _y1 - 1), (_x2 + 1, _y2 + 1), color=COLOR_GREEN, thickness=1)
+    cv2.rectangle(_cv2_mat, (_box_x1 - 1, _box_y1 - 1), (_box_x2 + 1, _box_y2 + 1), color=COLOR_GREEN, thickness=1)
 
 
 if __name__ == '__main__':
