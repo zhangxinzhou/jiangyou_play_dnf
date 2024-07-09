@@ -56,6 +56,18 @@ def show_mouse_position(_event, _x, _y, _flags, _params):
     mouse_y = _y
 
 
+# 判断是不是灰色图
+def calc_gray_confidence(_cv2_mat):
+    # 虽然不知道是什么原理,但是真的好用 来源 https://stackoverflow.org.cn/questions/64038736
+    hsv = cv2.cvtColor(_cv2_mat, cv2.COLOR_BGR2HSV)
+    # define range of gray color in HSV
+    lower_gray = np.array([0, 0, 0])
+    upper_gray = np.array([255, 10, 255])
+    # Threshold the HSV image to get only gray colors
+    mask = cv2.inRange(hsv, lower_gray, upper_gray)
+    return np.count_nonzero(mask) / mask.size
+
+
 COLOR_RED = (0, 0, 255)
 COLOR_GREEN = (0, 255, 0)
 
@@ -67,17 +79,26 @@ def hand_skill(_cv2_mat):
     _box_y1 = v3_all_role_config.SKILL_BOX_Y1
     _box_y2 = v3_all_role_config.SKILL_BOX_Y2
     # 具体技能
+    _all_count_y = 0
+    _all_count = 0
     for _skill_key, _skill_xy in v3_all_role_config.SKILL_ICON_LOCATION.items():
         _pt1_x, _pt1_y, _pt2_x, _pt2_y = _skill_xy
         _pt1, _pt2 = (_pt1_x, _pt1_y), (_pt2_x, _pt2_y)
         # 判断技能是否可用
         _skill_icon = _cv2_mat[_pt1_y:_pt2_y, _pt1_x:_pt2_x]
-        cv2.imwrite(f'_skill_{_skill_key}.jpg', _skill_icon)
-        # cv2.putText(_cv2_mat, text=_skill_key, org=(_pt1_x + 15, _pt1_y + 15),
-        # fontFace=cv2.FONT_HERSHEY_COMPLEX, fontScale=0.5, color=COLOR_RED)
-        cv2.rectangle(_cv2_mat, _pt1, _pt2, color=COLOR_RED, thickness=1)
+        _gray_confidence = calc_gray_confidence(_skill_icon)
+        _one_y = _gray_confidence > 0.6
+        _all_count += 1
+        if _one_y:
+            _all_count_y += 1
+        _color = COLOR_RED if _one_y else COLOR_GREEN
+        cv2.rectangle(_cv2_mat, _pt1, _pt2, color=_color, thickness=1)
+        redis_conn.set(f'_skill_{_skill_key}', 'Y' if _one_y else 'N')
     # 整个技能框
-    cv2.rectangle(_cv2_mat, (_box_x1 - 1, _box_y1 - 1), (_box_x2 + 1, _box_y2 + 1), color=COLOR_GREEN, thickness=1)
+    _all_y = _all_count_y / _all_count > 0.5
+    _color = COLOR_RED if _all_y else COLOR_GREEN
+    cv2.rectangle(_cv2_mat, (_box_x1 - 1, _box_y1 - 1), (_box_x2 + 1, _box_y2 + 1), color=_color, thickness=1)
+    redis_conn.set(f'_skill_all', 'Y' if _all_y else 'N')
 
 
 if __name__ == '__main__':
