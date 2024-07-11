@@ -140,11 +140,11 @@ class GlobalParameter(object):
         self.stage_end_time = None
         # 记录方法执行情况
         self.method_count: int = 0
-        self.method_name_list: list = []
-        self.method_name_list_limit: int = 20
         self.method_name_previous: str = None
         self.method_name_current: str = None
         self.method_name_next: str = None
+        self.method_name_continue_count = 0
+        self.method_name_continue_limit: int = 10
         # 角色相关配置
         self.v3_all_role_config = None
         self.v3_one_role_config = None
@@ -171,12 +171,13 @@ def aspect(func):
     def wrapper(*args, **kwargs):
         _f_name = func.__name__
         # 如果某一个方法被连续执行N次,说明很有可能被卡在了某种场景之中,处于死循环中,需要重置到某个初始场景中来跳出死循环
-        if len(GP.method_name_list) > GP.method_name_list_limit:
-            GP.method_name_list.pop(0)
-        GP.method_name_list.append(_f_name)
-        if len(set(GP.method_name_list)) == 1:
+        if GP.method_name_current == GP.method_name_current:
+            GP.method_name_continue_count += 1
+        else:
+            GP.method_name_continue_count = 0
+        if GP.method_name_continue_count > GP.method_name_continue_limit:
             print(f'method_name=[{_f_name}], continuously called by [{GP.method_name_list_limit}] times, so reset')
-            return program_reset
+            # return program_reset
 
         _time = time.time()
         GP.method_count += 1
