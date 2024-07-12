@@ -183,18 +183,18 @@ def aspect(func):
             print(f'method_name=[{GP.method_name_current}], continuously called by [{GP.method_name_continue_count}] times')
             # return program_reset
         execute_records_file.write(
-            f'index=[{GP.count:0>10d}],'
-            f' time=[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")}],'
-            f' method_name=[{_f_name:<20}] start\n'
+            f'index=[{GP.count:0>10d}]'
+            f', time=[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")}]'
+            f', method_name=[{_f_name:<20}] start\n'
         )
         _result = func(*args, **kwargs)
         GP.method_name_next = _f_name.__name__
         _cost = int((time.time() - _time) * 1000)
         execute_records_file.write(
-            f'index=[{GP.count:0>10d}],'
-            f' time=[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")}],'
-            f' method_name=[{_f_name:<20}] end,'
-            f'     cost=[{_cost:>6d}]ms\n'
+            f'index=[{GP.count:0>10d}]'
+            f', time=[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")}]'
+            f', method_name=[{_f_name:<20}] end'
+            f', cost=[{_cost:>6d}]ms\n'
         )
         # 暂停和退出
         global PROGRAM_EXIT
