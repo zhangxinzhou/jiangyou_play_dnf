@@ -170,19 +170,18 @@ execute_records_file = open('v3_execute_records.txt', 'w+', encoding='utf-8')
 def aspect(func):
     def wrapper(*args, **kwargs):
         _f_name = func.__name__
-        # 如果某一个方法被连续执行N次,说明很有可能被卡在了某种场景之中,处于死循环中,需要重置到某个初始场景中来跳出死循环
-        if GP.method_name_current == GP.method_name_current:
-            GP.method_name_continue_count += 1
-        else:
-            GP.method_name_continue_count = 0
-        if GP.method_name_continue_count > GP.method_name_continue_limit:
-            print(f'method_name=[{_f_name}], continuously called by [{GP.method_name_list_limit}] times, so reset')
-            # return program_reset
-
         _time = time.time()
         GP.method_count += 1
         GP.method_name_previous = GP.method_name_current
         GP.method_name_current = _f_name
+        # 如果某一个方法被连续执行N次,说明很有可能被卡在了某种场景之中,处于死循环中,需要重置到某个初始场景中来跳出死循环
+        if GP.method_name_previous == GP.method_name_current:
+            GP.method_name_continue_count += 1
+        else:
+            GP.method_name_continue_count = 0
+        if GP.method_name_continue_count > GP.method_name_continue_limit:
+            print(f'method_name=[{GP.method_name_current}], continuously called by [{GP.method_name_continue_count}] times')
+            # return program_reset
         execute_records_file.write(
             f'index=[{GP.count:0>10d}],'
             f' time=[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")}],'
