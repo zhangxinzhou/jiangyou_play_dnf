@@ -124,15 +124,15 @@ def get_window_rect(hwnd):
     return rect.left, rect.top, rect.right, rect.bottom
 
 
-def get_labels_info():
-    _dict = {
-        'exists': json.loads(REDIS_CONN.get('labels_exists_dict')),
-        'detail': json.loads(REDIS_CONN.get('labels_detail_dict'))
-    }
-    return _dict
+def redis_get_labels_list():
+    return json.loads(REDIS_CONN.get('labels_exists_dict'))
 
 
-def get_skill(skill_key):
+def redis_get_labels_detail():
+    return json.loads(REDIS_CONN.get('labels_detail_dict'))
+
+
+def redis_get_skill(skill_key):
     _skill = REDIS_CONN.hget('skill', skill_key)
     _skill_ok = _skill == b'Y'
     return _skill_ok
@@ -205,15 +205,15 @@ def aspect(func):
                 f'method_name=[{GP.method_name_current}], continuously called by [{GP.method_name_continue_count}] times')
             # return program_reset
         execute_records_file.write(
-            f'index=[{GP.count:0>10d}]'
+            f'index=[{GP.method_count:0>10d}]'
             f', time=[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")}]'
             f', method_name=[{_f_name:<20}] start\n'
         )
         _result = func(*args, **kwargs)
-        GP.method_name_next = _f_name.__name__
+        GP.method_name_next = _result
         _cost = int((time.time() - _time) * 1000)
         execute_records_file.write(
-            f'index=[{GP.count:0>10d}]'
+            f'index=[{GP.method_count:0>10d}]'
             f', time=[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")}]'
             f', method_name=[{_f_name:<20}] end'
             f', cost=[{_cost:>6d}]ms\n'
@@ -282,8 +282,10 @@ def program_route():
     # 识别到赛利亚->esa
     # 识别到选择角色框->点击
     # 识别到选择角色界面->选择角色
-
-    pass
+    _labels_list = redis_get_labels_list()
+    print("*" * 50)
+    for i in _labels_list:
+        print(i)
 
 
 @aspect
@@ -362,5 +364,6 @@ def play_one_role(_role_name):
 
 if __name__ == '__main__':
     # execute(first_method_name='progress_start')
+    program_route()
     print('xxxxx')
     pass
