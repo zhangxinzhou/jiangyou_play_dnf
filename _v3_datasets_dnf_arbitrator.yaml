@@ -1,0 +1,51 @@
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+# COCO128 dataset https://www.kaggle.com/ultralytics/coco128 (first 128 images from COCO xxx2017) by Ultralytics
+# Documentation: https://docs.ultralytics.com/datasets/detect/coco/
+# Example usage: yolo train data=_datasets_dnf_arbitrator.yaml
+# parent
+# ├── ultralytics
+# └── datasets
+#     └── coco128  ← downloads here (7 MB)
+
+# Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
+path: D:\repository\git\jiangyou_play_dnf\datasets\v3_dnf_arbitrator # dataset root dir
+# path: ../datasets/dnf_arbitrator # dataset root dir
+train: images
+val: images
+test: # test images (optional)
+
+# Classes
+names:
+  0: ___town___
+  1: town_role
+  2: town_select_role_icon
+  3: town_select_role_ui
+  4: town_game_start_button
+  5: town_role_play_quest_icon
+  6: town_play_task_icon_normal
+  7: town_play_task_icon_light
+  8: town_play_task_claim
+  9: town_transaction_protection_icon
+  10: town_menu_window
+  11: town_menu_teleportation_array
+  12: town_confirmation_pop
+  13: town_confirm_button
+  14: ___dungeon_common___
+  15: dungeon_common_arrow
+  16: dungeon_common_hp_boss
+  17: dungeon_common_hp_elite
+  18: dungeon_common_hp_common
+  19: dungeon_common_item
+  20: dungeon_common_shop_box
+  21: dungeon_common_continue_box
+  22: dungeon_common_continue_normal
+  23: dungeon_common_continue_gray
+  24: dungeon_common_select_dungeon
+  25: dungeon_common_back_town
+  26: ___dungeon_arbitrator____
+  27: dungeon_arbitrator_icon
+  28: dungeon_arbitrator_boss_box
+  29: dungeon_arbitrator_monster_rock
+  30: dungeon_arbitrator_monster_girl
+  31: dungeon_arbitrator_star_box_ball
+  32: dungeon_arbitrator_star_box_cube

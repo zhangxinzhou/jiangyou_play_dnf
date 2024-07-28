@@ -13,6 +13,8 @@ import win32con
 import win32gui
 from pynput import keyboard
 
+import v3_all_role_config as all_role_config
+
 # 关闭安全模式
 pyautogui.FAILSAFE = False
 # 延迟设置
@@ -53,7 +55,7 @@ listener.start()
 
 # redis
 REDIS_POOL = redis.ConnectionPool(host='127.0.0.1', port=6379)
-REDIS_CONN = redis.Redis(connection_pool=REDIS_POOL)
+REDIS_CONN = redis.Redis(connection_pool=REDIS_POOL, decode_responses=True)
 
 
 def press_key(key_list: list, duration=0.0, back_swing=0.3) -> None:
@@ -122,6 +124,20 @@ def get_window_rect(hwnd):
     return rect.left, rect.top, rect.right, rect.bottom
 
 
+def get_labels_info():
+    _dict = {
+        'exists': json.loads(REDIS_CONN.get('labels_exists_dict')),
+        'detail': json.loads(REDIS_CONN.get('labels_detail_dict'))
+    }
+    return _dict
+
+
+def get_skill(skill_key):
+    _skill = REDIS_CONN.hget('skill', skill_key)
+    _skill_ok = _skill == b'Y'
+    return _skill_ok
+
+
 #######################################################
 # utils END
 #######################################################
@@ -153,13 +169,18 @@ class GlobalParameter(object):
         self.role_current_round: int = 0
         self.role_max_round: int = 10
 
+        redis_key = "V3_ALL_ROLE_CONFIG_"
+        yesterday_str = time.strftime("%Y-%m-%d", time.localtime())
+        yesterday_redis_key = redis_key + yesterday_str
+        today_str = time.strftime("%Y-%m-%d", time.localtime(time.time() - 24 * 3600))
+        today_redis_key = redis_key + today_str
+        # 删除昨天的key
+        REDIS_CONN.delete(yesterday_redis_key)
         # 从redis中读取角色配置
-        redis_key = "V3_ALL_ROLE_STATUS_" + time.strftime("%Y-%m-%d", time.localtime())
-        redis_val = REDIS_CONN.get(redis_key)
+        redis_val = REDIS_CONN.get(today_redis_key)
         if redis_val is None:
-            with open('v3_all_role_config.json', 'r', encoding='utf-8') as f:
-                redis_val = f.read()
-            REDIS_CONN.set(name=redis_key, value=redis_val)
+            redis_val = json.dumps(all_role_config.ALL_ROLE_CONFIG_LIST)
+            REDIS_CONN.set(name=today_redis_key, value=redis_val)
         self.v3_all_role_config: list = json.loads(redis_val)
 
 
@@ -180,7 +201,8 @@ def aspect(func):
         else:
             GP.method_name_continue_count = 0
         if GP.method_name_continue_count > GP.method_name_continue_limit:
-            print(f'method_name=[{GP.method_name_current}], continuously called by [{GP.method_name_continue_count}] times')
+            print(
+                f'method_name=[{GP.method_name_current}], continuously called by [{GP.method_name_continue_count}] times')
             # return program_reset
         execute_records_file.write(
             f'index=[{GP.count:0>10d}]'
@@ -221,6 +243,16 @@ def aspect(func):
 #######################################################
 # 调用链 START
 #######################################################
+
+
+@aspect
+def template():
+    # 1.检查是否满足工作条件
+    # 2.满足开始工作,不满足等待N轮,N轮之后还不满足则路由到某个节点
+    # 3.开始工作
+    # 4.确认工作结束,传递给下一个节点
+    pass
+
 
 @aspect
 def program_start():
@@ -324,6 +356,11 @@ def execute():
         method_obj = method_obj()
 
 
-if __name__ == '__main__':
+def play_one_role(_role_name):
     pass
+
+
+if __name__ == '__main__':
     # execute(first_method_name='progress_start')
+    print('xxxxx')
+    pass

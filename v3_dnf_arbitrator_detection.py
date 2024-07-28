@@ -7,11 +7,12 @@ import time
 import cv2
 import numpy as np
 import redis
-import win32gui
 import supervision as sv
+import win32gui
 from PyQt5.QtGui import QImage
 from PyQt5.QtWidgets import QApplication
 from ultralytics import YOLO
+
 import v3_all_role_config
 
 # 游戏窗口截图所需
@@ -73,7 +74,7 @@ COLOR_GREEN = (0, 255, 0)
 
 
 # 判断技能是否可用的方法
-def hand_skill(_cv2_mat):
+def handle_skill(_cv2_mat):
     _box_x1 = v3_all_role_config.SKILL_BOX_X1
     _box_x2 = v3_all_role_config.SKILL_BOX_X2
     _box_y1 = v3_all_role_config.SKILL_BOX_Y1
@@ -87,18 +88,18 @@ def hand_skill(_cv2_mat):
         # 判断技能是否可用
         _skill_icon = _cv2_mat[_pt1_y:_pt2_y, _pt1_x:_pt2_x]
         _gray_confidence = calc_gray_confidence(_skill_icon)
-        _one_y = _gray_confidence > 0.6
+        _one_y = _gray_confidence < 0.6
         _all_count += 1
         if _one_y:
             _all_count_y += 1
-        _color = COLOR_RED if _one_y else COLOR_GREEN
+        _color = COLOR_GREEN if _one_y else COLOR_RED
         cv2.rectangle(_cv2_mat, _pt1, _pt2, color=_color, thickness=1)
-        redis_conn.set(f'_skill_{_skill_key}', 'Y' if _one_y else 'N')
+        redis_conn.hset('skill', _skill_key, 'Y' if _one_y else 'N')
     # 整个技能框
     _all_y = _all_count_y / _all_count > 0.5
-    _color = COLOR_RED if _all_y else COLOR_GREEN
+    _color = COLOR_GREEN if _all_y else COLOR_RED
     cv2.rectangle(_cv2_mat, (_box_x1 - 1, _box_y1 - 1), (_box_x2 + 1, _box_y2 + 1), color=_color, thickness=1)
-    redis_conn.set(f'_skill_all', 'Y' if _all_y else 'N')
+    redis_conn.hset('skill', f'all', 'Y' if _all_y else 'N')
 
 
 if __name__ == '__main__':
@@ -108,7 +109,7 @@ if __name__ == '__main__':
         print(f"can not find game [{window_title}]")
         exit(-1)
     print('start loading model')
-    model_path = r"models/yolov8x_best.pt"
+    model_path = r"models/best.pt"
     model = YOLO(model_path)
     print('end loading model')
 
@@ -207,7 +208,7 @@ if __name__ == '__main__':
             position_txt = f'x=[{mouse_x:>4}] y=[{mouse_y:>4}] color=[{cv2_mat[mouse_y][mouse_x]}]'
             cv2.putText(cv2_mat, text=position_txt, org=(20, 20 + 40), fontFace=cv2.FONT_HERSHEY_COMPLEX, fontScale=0.5,
                         color=(0, 0, 255))
-            hand_skill(cv2_mat)
+            handle_skill(cv2_mat)
             cv2.imshow(window_name, result.plot())
             key = cv2.waitKey(1)
 
