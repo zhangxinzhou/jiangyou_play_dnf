@@ -401,7 +401,7 @@ if __name__ == '__main__':
         # 拿分类标签
         _labels_list, _labels_dict = redis_get_labels_detail()
 
-        key_list = ['town_play_quest_claim_light', 'town_play_quest_icon_light', 'town_play_quest_close_button']
+        key_list = ['town_play_quest_claim_light', 'town_play_quest_icon_light', 'town_play_quest_ui_close_button']
         has_label = False
         for key in key_list:
             if _labels_list.__contains__(key):
