@@ -124,15 +124,15 @@ def get_window_rect(hwnd):
     return rect.left, rect.top, rect.right, rect.bottom
 
 
-def redis_get_labels_list():
-    return json.loads(REDIS_CONN.get('labels_exists_dict'))
+def redis_get_labels_detail() -> (list, dict):
+    _labels_dict: dict = json.loads(REDIS_CONN.get('labels_detail_dict'))
+    if _labels_dict is None:
+        _labels_dict = {}
+    _labels_list = [key for key, val in _labels_dict.items()]
+    return _labels_list, _labels_dict
 
 
-def redis_get_labels_detail():
-    return json.loads(REDIS_CONN.get('labels_detail_dict'))
-
-
-def redis_get_skill(skill_key):
+def redis_get_skill(skill_key) -> bool:
     _skill = REDIS_CONN.hget('skill', skill_key)
     _skill_ok = _skill == b'Y'
     return _skill_ok
@@ -282,10 +282,35 @@ def program_route():
     # 识别到赛利亚->esa
     # 识别到选择角色框->点击
     # 识别到选择角色界面->选择角色
-    _labels_list = redis_get_labels_list()
+    _labels_list, _labels_dict = redis_get_labels_detail()
+    _labels_list: list = _labels_list
+    _labels_dict: dict = _labels_dict
+
+    # town_play_task_icon_light
+    if _labels_list.__contains__('town_play_task_icon_light'):
+        return town_handle_play_task
+
     print("*" * 50)
-    for i in _labels_list:
-        print(i)
+
+
+# 畅玩任务
+@aspect
+def town_handle_play_task():
+    _labels_list, _labels_dict = redis_get_labels_detail()
+    _labels_list: list = _labels_list
+    _labels_dict: dict = _labels_dict
+    if _labels_list.__contains__('town_play_task_icon_light'):
+        # 点击畅玩任务图标
+        _x, _y = _labels_dict['town_play_task_icon_light']['label_box_center']
+        #
+        pydirectinput.moveTo(_x, _y)
+        mouse_left_click()
+        return town_handle_play_task
+
+    if _labels_list.__contains__('lingqu'):
+        return town_handle_play_task
+
+    return program_route
 
 
 @aspect
@@ -365,5 +390,4 @@ def play_one_role(_role_name):
 if __name__ == '__main__':
     # execute(first_method_name='progress_start')
     program_route()
-    print('xxxxx')
     pass

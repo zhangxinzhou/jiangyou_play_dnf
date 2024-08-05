@@ -156,6 +156,8 @@ if __name__ == '__main__':
         # 存在概率
         redis_conn.set(name='labels_exists_dict', value=json.dumps(label_rate_dict))
 
+        # 写入redis的值
+        label_dict = {}
         if len(labels) > 0:
             result_json_obj = json.loads(result.tojson())
             # 每个分类中找出一个概率最大的即可
@@ -164,7 +166,6 @@ if __name__ == '__main__':
                 last_n_result_list.pop(0)
             last_n_result_list.append(result_json_obj)
 
-            label_dict = {}
             for i in last_n_result_list:
                 for j in i:
                     label_name = j['name']
@@ -181,14 +182,13 @@ if __name__ == '__main__':
                         label_dict[label_name]['label_prob'] = label_prob
                         label_dict[label_name]['label_box'] = label_box
                         label_dict[label_name]['label_box_center'] = label_box_center
-
-            redis_conn.set(name='labels_detail_dict', value=json.dumps(label_dict))
             for k, v in label_dict.items():
                 print(k, v)
                 # 画出坐标
                 x, y = v['label_box_center']
                 cv2.line(cv2_mat, pt1=(x, y - 100), pt2=(x, y + 100), color=(0, 0, 255), thickness=3)
                 cv2.line(cv2_mat, pt1=(x - 100, y), pt2=(x + 100, y), color=(0, 0, 255), thickness=3)
+        redis_conn.set(name='labels_detail_dict', value=json.dumps(label_dict))
 
         # 需要查看监测的结果,就将show_window改为True
         show_window = True

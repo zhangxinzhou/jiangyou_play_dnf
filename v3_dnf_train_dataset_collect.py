@@ -1,6 +1,6 @@
+import datetime
 import os.path
 import sys
-import time
 
 import cv2
 import numpy as np
@@ -52,19 +52,15 @@ if __name__ == '__main__':
         print(f"can not find game [{window_title}]")
         exit(-1)
 
-    # 图片序号
-    index = 0
-    # 角色序号
-    role = 1
+    save_msg = f""
     while True:
         q_image = _screen.grabWindow(window_hwnd).toImage()
         cv2_mat = q_image_to_cv2_mat(q_image)
-        file_name = f"dnf_{role}{index:0>8d}.jpg"
-        img_data_full_path = os.path.join(datasets_images_path, f'{file_name}')
-        save_msg = f"save img [{file_name}] success"
         if save_image:
             save_image = False
-            index += 1
+            file_name = f"dnf_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg"
+            img_data_full_path = os.path.join(datasets_images_path, f'{file_name}')
+            save_msg = f"save img [{file_name}] success"
             cv2.imwrite(img_data_full_path, cv2_mat)
             print(save_msg)
 
