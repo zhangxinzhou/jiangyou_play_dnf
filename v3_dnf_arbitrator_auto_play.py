@@ -109,19 +109,24 @@ def mouse_right_click() -> None:
 
 
 def get_window_hand() -> None:
-    window_title = r'地下城与勇士：创新世纪'
-    window_hwnd = win32gui.FindWindow(None, window_title)
-    if window_title is None or window_hwnd == 0:
-        print(f"can not find game [{window_title}]")
+    _window_title = r'地下城与勇士：创新世纪'
+    _window_hwnd = win32gui.FindWindow(None, _window_title)
+    if _window_title is None or _window_hwnd == 0:
+        print(f"can not find game [{_window_title}]")
         sys.exit()
-    return window_hwnd
+    return _window_hwnd
 
 
-def get_window_rect(hwnd):
+def get_relative_window_rect(hwnd):
     _function = ctypes.windll.dwmapi.DwmGetWindowAttribute
     rect = ctypes.wintypes.RECT()
     _function(ctypes.wintypes.HWND(hwnd), ctypes.wintypes.DWORD(9), ctypes.byref(rect), ctypes.sizeof(rect))
     return rect.left, rect.top, rect.right, rect.bottom
+
+
+def get_absolute_window_rect(_hwnd, _game_x, _game_y):
+    _window_left, _window_top, _window_right, _window_bottom = get_relative_window_rect(_hwnd)
+    return _window_left + _game_x, _window_top + _game_y
 
 
 def redis_get_labels_detail() -> (list, dict):
@@ -288,14 +293,14 @@ def program_route():
 
     # town_play_task_icon_light
     if _labels_list.__contains__('town_play_task_icon_light'):
-        return town_handle_play_task
+        return handle_town_play_quest
 
     print("*" * 50)
 
 
 # 畅玩任务
 @aspect
-def town_handle_play_task():
+def handle_town_play_quest():
     _labels_list, _labels_dict = redis_get_labels_detail()
     _labels_list: list = _labels_list
     _labels_dict: dict = _labels_dict
@@ -305,12 +310,6 @@ def town_handle_play_task():
         #
         pydirectinput.moveTo(_x, _y)
         mouse_left_click()
-        return town_handle_play_task
-
-    if _labels_list.__contains__('lingqu'):
-        return town_handle_play_task
-
-    return program_route
 
 
 @aspect
@@ -389,5 +388,30 @@ def play_one_role(_role_name):
 
 if __name__ == '__main__':
     # execute(first_method_name='progress_start')
-    program_route()
-    pass
+    time.sleep(1)
+
+    window_hwnd = get_window_hand()
+    # 被其他窗口遮挡，调用后放到最前面
+    win32gui.SetForegroundWindow(window_hwnd)
+    # 解决被最小化的情况
+    win32gui.ShowWindow(window_hwnd, win32con.SW_RESTORE)
+    time.sleep(1)
+
+    while True:
+        # 拿分类标签
+        _labels_list, _labels_dict = redis_get_labels_detail()
+
+        key_list = ['town_play_quest_claim_light', 'town_play_quest_icon_light', 'town_play_quest_close_button']
+        has_label = False
+        for key in key_list:
+            if _labels_list.__contains__(key):
+                # 点击畅玩任务图标
+                game_x, game_y = _labels_dict[key]['label_box_center']
+                window_x, window_y = get_absolute_window_rect(window_hwnd, game_x, game_y)
+                pydirectinput.moveTo(window_x, window_y)
+                mouse_left_click()
+                has_label = True
+                time.sleep(0.3)
+
+        if not has_label and _labels_list.__contains__('town_play_quest_icon_gray'):
+            break
