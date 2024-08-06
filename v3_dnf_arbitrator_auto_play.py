@@ -133,8 +133,30 @@ def redis_get_labels_detail() -> (list, dict):
     _labels_dict: dict = json.loads(REDIS_CONN.get('labels_detail_dict'))
     if _labels_dict is None:
         _labels_dict = {}
-    _labels_list = [key for key, val in _labels_dict.items()]
+    _labels_list = [_key for _key, _val in _labels_dict.items()]
     return _labels_list, _labels_dict
+
+
+def redis_has_label(_label) -> bool:
+    _labels_list, _labels_dict = redis_get_labels_detail()
+    _labels_list: list = _labels_list
+    _labels_dict: dict = _labels_dict
+    _has_label = _labels_list.__contains__(_label)
+    return _has_label
+
+
+def redis_mouse_left_click_if_has_label(_label) -> bool:
+    _labels_list, _labels_dict = redis_get_labels_detail()
+    _labels_list: list = _labels_list
+    _labels_dict: dict = _labels_dict
+    _has_label = _labels_list.__contains__(_label)
+    if _has_label:
+        game_x, game_y = _labels_dict[_label]['label_box_center']
+        window_x, window_y = get_absolute_window_rect(window_hwnd, game_x, game_y)
+        pydirectinput.moveTo(window_x, window_y)
+        mouse_left_click()
+        time.sleep(0.3)
+    return _has_label
 
 
 def redis_get_skill(skill_key) -> bool:
@@ -287,29 +309,28 @@ def program_route():
     # 识别到赛利亚->esa
     # 识别到选择角色框->点击
     # 识别到选择角色界面->选择角色
-    _labels_list, _labels_dict = redis_get_labels_detail()
-    _labels_list: list = _labels_list
-    _labels_dict: dict = _labels_dict
-
-    # town_play_task_icon_light
-    if _labels_list.__contains__('town_play_task_icon_light'):
-        return handle_town_play_quest
 
     print("*" * 50)
 
 
 # 畅玩任务
-@aspect
 def handle_town_play_quest():
-    _labels_list, _labels_dict = redis_get_labels_detail()
-    _labels_list: list = _labels_list
-    _labels_dict: dict = _labels_dict
-    if _labels_list.__contains__('town_play_task_icon_light'):
-        # 点击畅玩任务图标
-        _x, _y = _labels_dict['town_play_task_icon_light']['label_box_center']
-        #
-        pydirectinput.moveTo(_x, _y)
-        mouse_left_click()
+    # 打开畅玩任务(畅玩任务图标的感叹号识别的不准确)
+    if not redis_has_label('town_play_quest_ui_header'):
+        redis_mouse_left_click_if_has_label('town_play_quest_icon_gray')
+    if not redis_has_label('town_play_quest_ui_header'):
+        redis_mouse_left_click_if_has_label('town_play_quest_icon_light')
+
+    # 领取奖励
+    while redis_mouse_left_click_if_has_label('town_play_quest_claim_light'):
+        pass
+
+    # 关闭畅玩任务(如果识别不出来关闭按钮,再点一下畅玩任务图标)
+    if not redis_mouse_left_click_if_has_label('town_play_quest_ui_close_button'):
+        if redis_has_label('town_play_quest_ui_header'):
+            redis_mouse_left_click_if_has_label('town_play_quest_icon_gray')
+        if redis_has_label('town_play_quest_ui_header'):
+            redis_mouse_left_click_if_has_label('town_play_quest_icon_light')
 
 
 @aspect
@@ -397,21 +418,4 @@ if __name__ == '__main__':
     win32gui.ShowWindow(window_hwnd, win32con.SW_RESTORE)
     time.sleep(1)
 
-    while True:
-        # 拿分类标签
-        _labels_list, _labels_dict = redis_get_labels_detail()
-
-        key_list = ['town_play_quest_claim_light', 'town_play_quest_icon_light', 'town_play_quest_ui_close_button']
-        has_label = False
-        for key in key_list:
-            if _labels_list.__contains__(key):
-                # 点击畅玩任务图标
-                game_x, game_y = _labels_dict[key]['label_box_center']
-                window_x, window_y = get_absolute_window_rect(window_hwnd, game_x, game_y)
-                pydirectinput.moveTo(window_x, window_y)
-                mouse_left_click()
-                has_label = True
-                time.sleep(0.3)
-
-        if not has_label and _labels_list.__contains__('town_play_quest_icon_gray'):
-            break
+    handle_town_play_quest()
