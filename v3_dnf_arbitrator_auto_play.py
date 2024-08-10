@@ -165,6 +165,19 @@ def redis_get_skill(skill_key) -> bool:
     return _skill_ok
 
 
+def wait_loading(wait_second_limit=10):
+    # 等待界面加载loading
+    start_time = time.time()
+    wait_second = 0
+    while wait_second <= 10 and not redis_has_label('town_play_quest_icon_gray') and not redis_has_label(
+            'town_play_quest_icon_light'):
+        wait_second = time.time() - start_time
+    if wait_second > wait_second_limit:
+        print('loading too long, skip')
+    else:
+        print('loading complete')
+
+
 #######################################################
 # utils END
 #######################################################
@@ -315,6 +328,8 @@ def program_route():
 
 # 畅玩任务
 def handle_town_play_quest():
+    wait_loading()
+
     # 打开畅玩任务(畅玩任务图标的感叹号识别的不准确)
     if not redis_has_label('town_play_quest_ui_header'):
         redis_mouse_left_click_if_has_label('town_play_quest_icon_gray')
