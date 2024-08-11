@@ -117,10 +117,14 @@ def get_window_hand() -> None:
     return _window_hwnd
 
 
-def get_relative_window_rect(hwnd):
+# 窗口/游戏句柄
+WINDOW_HWND = get_window_hand()
+
+
+def get_relative_window_rect(_hwnd):
     _function = ctypes.windll.dwmapi.DwmGetWindowAttribute
     rect = ctypes.wintypes.RECT()
-    _function(ctypes.wintypes.HWND(hwnd), ctypes.wintypes.DWORD(9), ctypes.byref(rect), ctypes.sizeof(rect))
+    _function(ctypes.wintypes.HWND(_hwnd), ctypes.wintypes.DWORD(9), ctypes.byref(rect), ctypes.sizeof(rect))
     return rect.left, rect.top, rect.right, rect.bottom
 
 
@@ -151,9 +155,9 @@ def redis_mouse_left_click_if_has_label(_label) -> bool:
     _labels_dict: dict = _labels_dict
     _has_label = _labels_list.__contains__(_label)
     if _has_label:
-        game_x, game_y = _labels_dict[_label]['label_box_center']
-        window_x, window_y = get_absolute_window_rect(window_hwnd, game_x, game_y)
-        pydirectinput.moveTo(window_x, window_y)
+        _game_x, _game_y = _labels_dict[_label]['label_box_center']
+        _window_x, _window_y = get_absolute_window_rect(WINDOW_HWND, _game_x, _game_y)
+        pydirectinput.moveTo(_window_x, _window_y)
         mouse_left_click()
         time.sleep(0.3)
     return _has_label
@@ -418,19 +422,77 @@ def execute():
         method_obj = method_obj()
 
 
-def play_one_role(_role_name):
+def to_select_role_ui():
+    if redis_has_label('town_game_start_button'):
+        return
+
+    for i in range(3):
+        if not redis_has_label('town_select_menu_select_role_light'):
+            press_key(key_list='esc', back_swing=0.1)
+            time.sleep(0.5)
+
+    if not redis_mouse_left_click_if_has_label('town_select_menu_select_role_light'):
+        print('can not find labels [town_select_menu_select_role_light]')
+        sys.exit(-1)
+
+# 进入目标副本
+# 1.esa打开传送阵
+# 2.
+def to_target_dungeon(_dungeon_name):
+    pass
+
+
+def play_one_role(_one_role_config: dict):
+    _role_name = _one_role_config.get('role_name')
+    _role_status = _one_role_config.get('role_status')
+    _role_xy = _one_role_config.get('role_xy')
+    _handle_buff = _one_role_config.get('handle_buff')
+    _handle_monster = _one_role_config.get('handle_monster')
+    _handle_boss = _one_role_config.get('handle_boss')
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name}] start]')
+    # 进入选择角色ui
+    to_select_role_ui()
+    time.sleep(3)
+    # 选择角色
+    _window_left, _window_top, _window_right, _window_bottom = get_relative_window_rect(WINDOW_HWND)
+    _window_width = _window_right - _window_left
+    _window_height = _window_bottom - _window_top
+    _game_x_percent, _game_y_percent = _role_xy[0], _role_xy[1]
+    _role_x = int(_window_left + _window_width * _game_x_percent)
+    _role_y = int(_window_top + _window_height * _game_y_percent)
+    pydirectinput.moveTo(_role_x, _role_y)
+    mouse_left_double_click()
+    # 畅玩任务,领取奖励
+    handle_town_play_quest()
+    # 进入目标副本
+
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name}] end]')
+
+    sys.exit(1)
     pass
 
 
 if __name__ == '__main__':
-    # execute(first_method_name='progress_start')
     time.sleep(1)
 
-    window_hwnd = get_window_hand()
     # 被其他窗口遮挡，调用后放到最前面
-    win32gui.SetForegroundWindow(window_hwnd)
+    win32gui.SetForegroundWindow(WINDOW_HWND)
     # 解决被最小化的情况
-    win32gui.ShowWindow(window_hwnd, win32con.SW_RESTORE)
+    win32gui.ShowWindow(WINDOW_HWND, win32con.SW_RESTORE)
     time.sleep(1)
 
-    handle_town_play_quest()
+    # 从redis中读取配置
+    redis_key = "V3_ALL_ROLE_CONFIG_"
+    today_str = time.strftime("%Y-%m-%d", time.localtime(time.time() - 24 * 3600))
+    today_redis_key = redis_key + today_str
+    # 从redis中读取角色配置
+    redis_val = REDIS_CONN.get(today_redis_key)
+    if redis_val is None:
+        redis_val = json.dumps(all_role_config.ALL_ROLE_CONFIG_LIST)
+        REDIS_CONN.set(name=today_redis_key, value=redis_val)
+    all_role_config_list = json.loads(redis_val)
+    for one_role_config in all_role_config_list:
+        play_one_role(one_role_config)
+        break
+
+    # handle_town_play_quest()
