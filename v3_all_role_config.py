@@ -2,7 +2,7 @@ ALL_ROLE_CONFIG_LIST = [
     {
         "role_name": "modao",
         "role_status": "todo",
-        "role_xy": [3 / 8, 1 / 3],
+        "role_xy": [2 / 8, 1 / 3],
         "handle_buff": [
             {"key_list": ["up", "right", "space"], "back_swing": 0.3},
             {"key_list": ["up", "up", "space"], "back_swing": 0.3},
@@ -20,7 +20,7 @@ ALL_ROLE_CONFIG_LIST = [
     {
         "role_name": "naima01",
         "role_status": "todo",
-        "role_xy": [4 / 8, 1 / 3],
+        "role_xy": [3 / 8, 1 / 3],
         "handle_buff": [
             {"key_list": ["right", "right", "space"], "back_swing": 0.3},
             {"key_list": ["up", "up", "space"], "back_swing": 0.3},
@@ -37,7 +37,7 @@ ALL_ROLE_CONFIG_LIST = [
     {
         "role_name": "nailuo",
         "role_status": "todo",
-        "role_xy": [5 / 8, 1 / 3],
+        "role_xy": [4 / 8, 1 / 3],
         "handle_buff": [
             {"key_list": ["right", "right", "space"], "back_swing": 0.3},
             {"key_list": ["up", "up", "space"], "back_swing": 0.5},
@@ -54,7 +54,7 @@ ALL_ROLE_CONFIG_LIST = [
     {
         "role_name": "naima02",
         "role_status": "todo",
-        "role_xy": [6 / 8, 1 / 3],
+        "role_xy": [5 / 8, 1 / 3],
         "handle_buff": [
             {"key_list": ["right", "right", "space"], "back_swing": 0.3},
             {"key_list": ["up", "up", "space"], "back_swing": 0.3},
@@ -71,7 +71,7 @@ ALL_ROLE_CONFIG_LIST = [
     {
         "role_name": "zhaohuan",
         "role_status": "todo",
-        "role_xy": [7 / 8, 1 / 3],
+        "role_xy": [6 / 8, 1 / 3],
         "handle_buff": [
             {"key_list": ["q"], "back_swing": 2},
             {"key_list": ["r"], "back_swing": 0.5},
@@ -119,7 +119,7 @@ ALL_ROLE_CONFIG_LIST = [
     {
         "role_name": "papading",
         "role_status": "todo",
-        "role_xy": [2 / 8, 2 / 3],
+        "role_xy": [3 / 8, 2 / 3],
         "handle_buff": [
             {"key_list": ["right", "right", "space"], "back_swing": 0.3},
             {"key_list": ["r"], "back_swing": 0.3}

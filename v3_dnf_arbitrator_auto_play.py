@@ -149,6 +149,16 @@ def redis_has_label(_label) -> bool:
     return _has_label
 
 
+def redis_fuzzy_search_label(_label) -> bool:
+    _labels_list, _labels_dict = redis_get_labels_detail()
+    _labels_list: list[str] = _labels_list
+    _labels_dict: dict = _labels_dict
+    for _label_name in _labels_list:
+        if _label_name.__contains__(_label):
+            return True
+    return False
+
+
 def redis_mouse_left_click_if_has_label(_label) -> bool:
     _labels_list, _labels_dict = redis_get_labels_detail()
     _labels_list: list = _labels_list
@@ -169,17 +179,55 @@ def redis_get_skill(skill_key) -> bool:
     return _skill_ok
 
 
+def wait_label_exists(_label_list: list, _wait_second_limit=10):
+    # 等待界面加载loading
+    _start_time = time.time()
+    while True:
+        time.sleep(0.5)
+        if time.time() - _start_time > _wait_second_limit:
+            print('loading too long, skip')
+            return
+        for _label in _label_list:
+            if redis_has_label('town_play_quest_icon_gray'):
+                # print('loading complete')
+                return None
+
+
 def wait_loading(wait_second_limit=10):
     # 等待界面加载loading
-    start_time = time.time()
-    wait_second = 0
-    while wait_second <= 10 and not redis_has_label('town_play_quest_icon_gray') and not redis_has_label(
-            'town_play_quest_icon_light'):
-        wait_second = time.time() - start_time
-    if wait_second > wait_second_limit:
-        print('loading too long, skip')
-    else:
-        print('loading complete')
+    _label_list = ['town_play_quest_icon_gray', 'town_play_quest_icon_light']
+    wait_label_exists(_label_list, wait_second_limit)
+
+
+def redis_get_all_role_config_key():
+    # 从redis中读取配置
+    _redis_key = "V3_ALL_ROLE_CONFIG_"
+    _today_str = time.strftime("%Y-%m-%d", time.localtime(time.time() - 24 * 3600))
+    _today_redis_key = _redis_key + _today_str
+    return _today_redis_key
+
+
+def redis_get_one_role_config(_role_name) -> dict:
+    _today_redis_key = redis_get_all_role_config_key()
+    _exist = REDIS_CONN.exists(_today_redis_key)
+    if _exist == 0:
+        all_role_config_list = all_role_config.ALL_ROLE_CONFIG_LIST
+        for one in all_role_config_list:
+            _key = _today_redis_key
+            _value = one['role_name']
+            _map = json.dumps(one)
+            REDIS_CONN.hset(_key, _value, _map)
+
+    _redis_val = REDIS_CONN.hget(_today_redis_key, _role_name)
+    if _redis_val is None:
+        print(f'miss role=[{_role_name}] config')
+
+    return json.loads(str(_redis_val, encoding='utf-8'))
+
+
+def redis_set_one_role_config(_one_role_config: dict) -> None:
+    _today_redis_key = redis_get_all_role_config_key()
+    REDIS_CONN.hset(_today_redis_key, json.dumps(_one_role_config))
 
 
 #######################################################
@@ -212,20 +260,6 @@ class GlobalParameter(object):
         self.role_name: str = None
         self.role_current_round: int = 0
         self.role_max_round: int = 10
-
-        redis_key = "V3_ALL_ROLE_CONFIG_"
-        yesterday_str = time.strftime("%Y-%m-%d", time.localtime())
-        yesterday_redis_key = redis_key + yesterday_str
-        today_str = time.strftime("%Y-%m-%d", time.localtime(time.time() - 24 * 3600))
-        today_redis_key = redis_key + today_str
-        # 删除昨天的key
-        REDIS_CONN.delete(yesterday_redis_key)
-        # 从redis中读取角色配置
-        redis_val = REDIS_CONN.get(today_redis_key)
-        if redis_val is None:
-            redis_val = json.dumps(all_role_config.ALL_ROLE_CONFIG_LIST)
-            REDIS_CONN.set(name=today_redis_key, value=redis_val)
-        self.v3_all_role_config: list = json.loads(redis_val)
 
 
 GP = GlobalParameter()
@@ -428,21 +462,40 @@ def to_select_role_ui():
 
     for i in range(3):
         if not redis_has_label('town_select_menu_select_role_light'):
-            press_key(key_list='esc', back_swing=0.1)
+            press_key(key_list=['esc'], back_swing=0.1)
             time.sleep(0.5)
 
     if not redis_mouse_left_click_if_has_label('town_select_menu_select_role_light'):
         print('can not find labels [town_select_menu_select_role_light]')
         sys.exit(-1)
 
-# 进入目标副本
-# 1.esa打开传送阵
-# 2.
-def to_target_dungeon(_dungeon_name):
+
+# 进入副本
+def to_dungeon_arbitrator():
+    for i in range(3):
+        if not redis_has_label('town_select_menu_teleportation_light'):
+            press_key(key_list=['esc'], back_swing=0.1)
+
+    redis_mouse_left_click_if_has_label('town_select_menu_teleportation_light')
+    redis_mouse_left_click_if_has_label('dungeon_arbitrator_icon')
+    for i in range(2):
+        if not redis_mouse_left_click_if_has_label('dungeon_arbitrator_icon'):
+            press_key(key_list=['right'], duration=3)
+
+
+def handle_dungeon_common(_role_name):
     pass
 
 
-def play_one_role(_one_role_config: dict):
+def to_target_dungeon(_dungeon_name='dungeon_arbitrator'):
+    if _dungeon_name == 'dungeon_arbitrator':
+        to_dungeon_arbitrator()
+    else:
+        print(f'this is no [{_dungeon_name}]')
+
+
+def play_one_role(_role_name):
+    _one_role_config = redis_get_one_role_config(_role_name)
     _role_name = _one_role_config.get('role_name')
     _role_status = _one_role_config.get('role_status')
     _role_xy = _one_role_config.get('role_xy')
@@ -452,7 +505,7 @@ def play_one_role(_one_role_config: dict):
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name}] start]')
     # 进入选择角色ui
     to_select_role_ui()
-    time.sleep(3)
+    wait_label_exists(['town_game_start_button'])
     # 选择角色
     _window_left, _window_top, _window_right, _window_bottom = get_relative_window_rect(WINDOW_HWND)
     _window_width = _window_right - _window_left
@@ -465,11 +518,8 @@ def play_one_role(_one_role_config: dict):
     # 畅玩任务,领取奖励
     handle_town_play_quest()
     # 进入目标副本
-
+    to_dungeon_arbitrator()
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name}] end]')
-
-    sys.exit(1)
-    pass
 
 
 if __name__ == '__main__':
@@ -481,18 +531,8 @@ if __name__ == '__main__':
     win32gui.ShowWindow(WINDOW_HWND, win32con.SW_RESTORE)
     time.sleep(1)
 
-    # 从redis中读取配置
-    redis_key = "V3_ALL_ROLE_CONFIG_"
-    today_str = time.strftime("%Y-%m-%d", time.localtime(time.time() - 24 * 3600))
-    today_redis_key = redis_key + today_str
-    # 从redis中读取角色配置
-    redis_val = REDIS_CONN.get(today_redis_key)
-    if redis_val is None:
-        redis_val = json.dumps(all_role_config.ALL_ROLE_CONFIG_LIST)
-        REDIS_CONN.set(name=today_redis_key, value=redis_val)
-    all_role_config_list = json.loads(redis_val)
-    for one_role_config in all_role_config_list:
-        play_one_role(one_role_config)
-        break
+    role_name_list = ['modao', 'naima01', 'nailuo', 'naima02', 'zhaohuan', 'saber', 'zhanfa', 'papading']
+    for role_name in role_name_list:
+        play_one_role(role_name)
 
     # handle_town_play_quest()
