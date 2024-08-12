@@ -58,29 +58,34 @@ REDIS_POOL = redis.ConnectionPool(host='127.0.0.1', port=6379)
 REDIS_CONN = redis.Redis(connection_pool=REDIS_POOL, decode_responses=True)
 
 
-def press_key(key_list: list, duration=0.0, back_swing=0.3) -> None:
+def press_key(_key_list: list, _duration=0.0, _back_swing=0.3) -> None:
     """
-    :param key_list: 按键
-    :param duration: 按键持续时间,单位秒
-    :param back_swing: 技能后摇时间,单位秒
+    :param _key_list: 按键
+    :param _duration: 按键持续时间,单位秒
+    :param _back_swing: 技能后摇时间,单位秒
     :return:
     """
-    key_list_len = len(key_list)
+    key_list_len = len(_key_list)
     if key_list_len <= 0:
         raise Exception("key_list must not be empty!")
-    if duration <= 0.0:
-        pydirectinput.press(key_list)
+    if _duration is None:
+        _duration = 0.0
+    if _back_swing is None:
+        _back_swing = 0.3
+
+    if _duration <= 0.0:
+        pydirectinput.press(_key_list)
     else:
-        last_key = key_list[-1]
-        other_key_list = key_list[:-1]
+        last_key = _key_list[-1]
+        other_key_list = _key_list[:-1]
         if len(other_key_list) > 0:
             pydirectinput.press(other_key_list)
         pydirectinput.keyDown(last_key)
-        time.sleep(duration)
+        time.sleep(_duration)
         pydirectinput.keyUp(last_key)
 
     # 休眠后摇时间
-    time.sleep(back_swing)
+    time.sleep(_back_swing)
 
 
 def mouse_left_click() -> None:
@@ -462,7 +467,7 @@ def to_select_role_ui():
 
     for i in range(3):
         if not redis_has_label('town_select_menu_select_role_light'):
-            press_key(key_list=['esc'], back_swing=0.1)
+            press_key(_key_list=['esc'], _back_swing=0.1)
             time.sleep(0.5)
 
     if not redis_mouse_left_click_if_has_label('town_select_menu_select_role_light'):
@@ -474,17 +479,80 @@ def to_select_role_ui():
 def to_dungeon_arbitrator():
     for i in range(3):
         if not redis_has_label('town_select_menu_teleportation_light'):
-            press_key(key_list=['esc'], back_swing=0.1)
+            press_key(_key_list=['esc'], _back_swing=0.1)
 
     redis_mouse_left_click_if_has_label('town_select_menu_teleportation_light')
     redis_mouse_left_click_if_has_label('dungeon_arbitrator_icon')
     for i in range(2):
         if not redis_mouse_left_click_if_has_label('dungeon_arbitrator_icon'):
-            press_key(key_list=['right'], duration=3)
+            press_key(_key_list=['right'], _duration=3)
 
 
-def handle_dungeon_common(_role_name):
+def handle_key_list(_key_list: list):
+    if _key_list is None or len(_key_list) == 0:
+        return
+    for _one in _key_list:
+        _one: dict = _one
+        press_key(_key_list=_one.get('key_list'), _duration=_one.get('duration'), _back_swing=_one.get('back_swing'))
+
+
+# 上buff
+def handle_dungeon_stage_start(_role_name):
+    _one_role_config = redis_get_one_role_config(_role_name)
+    _handle_buff = _one_role_config.get('handle_buff')
+    wait_label_exists(['dungeon_common_arrow'])
+    handle_key_list(_handle_buff)
+
+
+# 识别到商店,维修武器,关闭商店
+# 识别到道具,捡道具
+# 识别到
+# true 可以继续挑战,false 无法继续挑战
+def handle_dungeon_stage_end(_role_name) -> bool:
+    wait_label_exists(['dungeon_common_shop_box'])
+    if redis_has_label('dungeon_common_shop_box'):
+        # 维修武器
+        press_key(_key_list=['s', 'space'], _back_swing=0.1)
+        time.sleep(3)
+        # 关闭商店
+        press_key(_key_list=['esc'], _back_swing=0.5)
+        # 数字0 移动物品 捡东西
+        press_key(_key_list=['0'], _back_swing=0.5)
+        # 捡东西
+        for _i in range(20):
+            press_key(_key_list=['x'])
+
+    if redis_has_label('dungeon_common_continue_normal'):
+        redis_mouse_left_click_if_has_label('dungeon_common_continue_normal')
+    if redis_has_label('dungeon_common_continue_gray'):
+        press_key(_key_list=['f12'])
+
+
+def handle_dungeon_stage_clear(_role_name):
     pass
+
+
+def handle_dungeon_one_round(_role_name):
+    _one_role_config = redis_get_one_role_config(_role_name)
+    _role_name = _one_role_config.get('role_name')
+    _role_status = _one_role_config.get('role_status')
+    _role_xy = _one_role_config.get('role_xy')
+    _handle_buff = _one_role_config.get('handle_buff')
+    _handle_monster = _one_role_config.get('handle_monster')
+    _handle_boss = _one_role_config.get('handle_boss')
+    # 上buff
+    handle_dungeon_stage_start(_role_name)
+    # 刷图
+    handle_dungeon_stage_clear(_role_name)
+    # 关卡结束
+    handle_dungeon_stage_end(_role_name)
+    pass
+
+
+def handle_dungeon_all_round(_role_name):
+    _MAX_ROUND = 4
+    for _round in range(_MAX_ROUND):
+        handle_dungeon_one_round(_role_name)
 
 
 def to_target_dungeon(_dungeon_name='dungeon_arbitrator'):
@@ -534,5 +602,8 @@ if __name__ == '__main__':
     role_name_list = ['modao', 'naima01', 'nailuo', 'naima02', 'zhaohuan', 'saber', 'zhanfa', 'papading']
     for role_name in role_name_list:
         play_one_role(role_name)
+        pass
 
+    #role_name = 'modao'
+    #handle_dungeon_stage_end(role_name)
     # handle_town_play_quest()
