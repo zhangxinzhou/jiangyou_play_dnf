@@ -185,10 +185,10 @@ def wait_label_exists(_label_list: list, _wait_second_limit=10):
     while True:
         time.sleep(0.5)
         if time.time() - _start_time > _wait_second_limit:
-            print('loading too long, skip')
+            print(f'wait label [{_label_list}] too long, skip')
             return
         for _label in _label_list:
-            if redis_has_label('town_play_quest_icon_gray'):
+            if redis_has_label(_label):
                 # print('loading complete')
                 return None
 
@@ -518,7 +518,7 @@ def play_one_role(_role_name):
     # 畅玩任务,领取奖励
     handle_town_play_quest()
     # 进入目标副本
-    to_dungeon_arbitrator()
+    # to_dungeon_arbitrator()
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name}] end]')
 
 
