@@ -139,6 +139,19 @@ def get_absolute_window_rect(_hwnd, _game_x, _game_y):
 
 
 def redis_get_labels_detail() -> (list, dict):
+    # 暂停和退出控制
+    global PROGRAM_EXIT
+    global PROGRAM_PAUSE
+    if PROGRAM_EXIT:
+        print("program exit.")
+        sys.exit(-1)
+    while PROGRAM_PAUSE:
+        if PROGRAM_EXIT:
+            print("program exit.")
+            sys.exit(-1)
+        print("program pause...")
+        time.sleep(1)
+
     _labels_dict: dict = json.loads(REDIS_CONN.get('labels_detail_dict'))
     if _labels_dict is None:
         _labels_dict = {}
@@ -178,7 +191,7 @@ def redis_mouse_left_click_if_has_label(_label) -> bool:
     return _has_label
 
 
-def redis_get_skill(skill_key) -> bool:
+def redis_get_skill_able(skill_key) -> bool:
     _skill = REDIS_CONN.hget('skill', skill_key)
     _skill_ok = _skill == b'Y'
     return _skill_ok
@@ -239,135 +252,6 @@ def redis_set_one_role_config(_one_role_config: dict) -> None:
 # utils END
 #######################################################
 
-#######################################################
-# global start
-#######################################################
-class GlobalParameter(object):
-    def __init__(self):
-        # 时间
-        self.progress_start_time = None
-        self.progress_end_time = None
-        self.role_start_time = None
-        self.role_end_time = None
-        self.stage_start_time = None
-        self.stage_end_time = None
-        # 记录方法执行情况
-        self.method_count: int = 0
-        self.method_name_previous: str = None
-        self.method_name_current: str = None
-        self.method_name_next: str = None
-        self.method_name_continue_count = 0
-        self.method_name_continue_limit: int = 10
-        # 角色相关配置
-        self.v3_all_role_config = None
-        self.v3_one_role_config = None
-        #
-        self.role_name: str = None
-        self.role_current_round: int = 0
-        self.role_max_round: int = 10
-
-
-GP = GlobalParameter()
-execute_records_file = open('v3_execute_records.txt', 'w+', encoding='utf-8')
-
-
-def aspect(func):
-    def wrapper(*args, **kwargs):
-        _f_name = func.__name__
-        _time = time.time()
-        GP.method_count += 1
-        GP.method_name_previous = GP.method_name_current
-        GP.method_name_current = _f_name
-        # 如果某一个方法被连续执行N次,说明很有可能被卡在了某种场景之中,处于死循环中,需要重置到某个初始场景中来跳出死循环
-        if GP.method_name_previous == GP.method_name_current:
-            GP.method_name_continue_count += 1
-        else:
-            GP.method_name_continue_count = 0
-        if GP.method_name_continue_count > GP.method_name_continue_limit:
-            print(
-                f'method_name=[{GP.method_name_current}], continuously called by [{GP.method_name_continue_count}] times')
-            # return program_reset
-        execute_records_file.write(
-            f'index=[{GP.method_count:0>10d}]'
-            f', time=[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")}]'
-            f', method_name=[{_f_name:<20}] start\n'
-        )
-        _result = func(*args, **kwargs)
-        GP.method_name_next = _result
-        _cost = int((time.time() - _time) * 1000)
-        execute_records_file.write(
-            f'index=[{GP.method_count:0>10d}]'
-            f', time=[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")}]'
-            f', method_name=[{_f_name:<20}] end'
-            f', cost=[{_cost:>6d}]ms\n'
-        )
-        # 暂停和退出
-        global PROGRAM_EXIT
-        global PROGRAM_PAUSE
-        if PROGRAM_EXIT:
-            print("program exit...")
-            sys.exit(-1)
-        while PROGRAM_PAUSE:
-            if PROGRAM_EXIT:
-                print("program exit...")
-                sys.exit(-1)
-            print("program pause...")
-            time.sleep(1)
-        return _result
-
-    return wrapper
-
-
-#######################################################
-# global end
-#######################################################
-
-
-#######################################################
-# 调用链 START
-#######################################################
-
-
-@aspect
-def template():
-    # 1.检查是否满足工作条件
-    # 2.满足开始工作,不满足等待N轮,N轮之后还不满足则路由到某个节点
-    # 3.开始工作
-    # 4.确认工作结束,传递给下一个节点
-    pass
-
-
-@aspect
-def program_start():
-    GP.progress_start_time = time.time()
-    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] program start')
-    return program_route
-
-
-@aspect
-def program_end():
-    GP.progress_end_time = time.time()
-    _cost = int(GP.progress_end_time - GP.progress_end_time)
-    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] program end, cost=[{_cost}s]')
-    sys.exit(0)
-
-
-@aspect
-def program_reset():
-    # 如果某一个方法被连续执行N次,说明很有可能被卡在了某种场景之中,通过该方法重置
-    return program_route
-
-
-@aspect
-def program_route():
-    # route思路:识别xx场景->路由到执行xx场景的方法
-    # 识别到loading->执行等一秒
-    # 识别到赛利亚->esa
-    # 识别到选择角色框->点击
-    # 识别到选择角色界面->选择角色
-
-    print("*" * 50)
-
 
 # 畅玩任务
 def handle_town_play_quest():
@@ -389,76 +273,6 @@ def handle_town_play_quest():
             redis_mouse_left_click_if_has_label('town_play_quest_icon_gray')
         if redis_has_label('town_play_quest_ui_header'):
             redis_mouse_left_click_if_has_label('town_play_quest_icon_light')
-
-
-@aspect
-def role_start():
-    GP.role_start_time = time.time()
-    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{GP.role_name}] start]')
-    return role_route
-
-
-@aspect
-def role_end():
-    GP.role_end_time = time.time()
-    _cost = int(GP.role_start_time - GP.role_end_time)
-    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{GP.role_name}] end, cost=[{_cost}s]')
-    pass
-
-
-@aspect
-def role_route():
-    pass
-
-
-@aspect
-def stage_start():
-    GP.role_start_time = time.time()
-    print(
-        f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{GP.role_name}], '
-        f'round=[{GP.role_current_round:>2}/{GP.role_max_round:>2}] start]')
-    return stage_route
-
-
-@aspect
-def stage_end():
-    GP.role_end_time = time.time()
-    _cost = int(GP.role_start_time - GP.role_end_time)
-    print(
-        f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{GP.role_name}], '
-        f'round=[{GP.role_current_round:>2}/{GP.role_max_round:>2}] end], cost=[{_cost}s]')
-    return program_route
-
-
-@aspect
-def stage_route():
-    pass
-
-
-@aspect
-def role_select():
-    for _i in GP.v3_all_role_config:
-        _role_dict: dict = _i
-        _role_name = _role_dict.get('role_name')
-        _role_status = _role_dict.get('role_status')
-        if _role_status == 'done':
-            continue
-        elif _role_status == 'todo':
-            GP.role_name = _role_name
-            GP.v3_one_role_config = _role_dict
-            GP.next_method_name = 'role_start'
-            return
-    GP.next_method_name = 'progress_end'
-
-
-#######################################################
-# 调用链 END
-#######################################################
-
-def execute():
-    method_obj = program_start
-    while True:
-        method_obj = method_obj()
 
 
 def to_select_role_ui():
@@ -528,8 +342,49 @@ def handle_dungeon_stage_end(_role_name) -> bool:
         press_key(_key_list=['f12'])
 
 
+def role_run():
+    pydirectinput.press('right')
+    time.sleep(0.1)
+    pydirectinput.keyDown('right')
+    time.sleep(0.5)
+    while True:
+        if redis_fuzzy_search_label('monster') or redis_fuzzy_search_label('boss') or redis_fuzzy_search_label(
+                'star_box'):
+            pydirectinput.keyUp('right')
+            return
+        time.sleep(0.5)
+
+
+def handle_skill(_skill):
+    _skill_key = _skill.get('key_list')[0]
+    if redis_get_skill_able(_skill_key):
+        press_key(_key_list=_skill.get('key_list'), _duration=_skill.get('duration'),
+                  _back_swing=_skill.get('back_swing'))
+        time.sleep(0.5)
+
+
 def handle_dungeon_stage_clear(_role_name):
-    pass
+    _one_role_config = redis_get_one_role_config(_role_name)
+    _handle_monster = _one_role_config.get('handle_monster')
+    _handle_boss = _one_role_config.get('handle_boss')
+    while True:
+        _has_dungeon_shop_box = redis_has_label('dungeon_common_shop_box')
+        _has_dungeon_monster = redis_fuzzy_search_label('monster')
+        _has_dungeon_boss = redis_fuzzy_search_label('boss')
+
+        if _has_dungeon_shop_box:
+            break
+
+        _has_enemy = _has_dungeon_monster or _has_dungeon_boss
+        if not _has_enemy:
+            role_run()
+        else:
+            if _has_dungeon_monster:
+                for _skill in _handle_monster:
+                    handle_skill(_skill)
+            else:
+                for _skill in _handle_boss + _handle_monster:
+                    handle_skill(_skill)
 
 
 def handle_dungeon_one_round(_role_name):
@@ -570,7 +425,7 @@ def play_one_role(_role_name):
     _handle_buff = _one_role_config.get('handle_buff')
     _handle_monster = _one_role_config.get('handle_monster')
     _handle_boss = _one_role_config.get('handle_boss')
-    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name}] start]')
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] start')
     # 进入选择角色ui
     to_select_role_ui()
     wait_label_exists(['town_game_start_button'])
@@ -587,10 +442,11 @@ def play_one_role(_role_name):
     handle_town_play_quest()
     # 进入目标副本
     # to_dungeon_arbitrator()
-    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name}] end]')
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] end')
 
 
 if __name__ == '__main__':
+    REDIS_CONN.flushall()
     time.sleep(1)
 
     # 被其他窗口遮挡，调用后放到最前面
@@ -601,9 +457,11 @@ if __name__ == '__main__':
 
     role_name_list = ['modao', 'naima01', 'nailuo', 'naima02', 'zhaohuan', 'saber', 'zhanfa', 'papading']
     for role_name in role_name_list:
-        play_one_role(role_name)
+        # play_one_role(role_name)
         pass
 
-    #role_name = 'modao'
-    #handle_dungeon_stage_end(role_name)
-    # handle_town_play_quest()
+    role_name = 'naima02'
+    # to_dungeon_arbitrator()
+    handle_dungeon_stage_start(role_name)
+    handle_dungeon_stage_clear(role_name)
+    handle_dungeon_stage_end(role_name)

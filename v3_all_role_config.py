@@ -4,17 +4,19 @@ ALL_ROLE_CONFIG_LIST = [
         "role_status": "todo",
         "role_xy": [2 / 8, 1 / 3],
         "handle_buff": [
-            {"key_list": ["up", "right", "space"], "back_swing": 0.3},
-            {"key_list": ["up", "up", "space"], "back_swing": 0.3},
-            {"key_list": ["down", "up", "space"], "back_swing": 0.3},
-            {"key_list": ["down", "space"], "back_swing": 0.3},
-            {"key_list": ["space"], "back_swing": 0.3}
+            {"key_list": ["up", "right", "space"], "back_swing": 0.5},
+            {"key_list": ["up", "up", "space"], "back_swing": 2},
+            {"key_list": ["down", "space"], "back_swing": 0.5},
+            {"key_list": ["space"], "back_swing": 0.5}
         ],
         "handle_monster": [
-            {"key_list": ["w"], "back_swing": 0.3}
+            {"key_list": ["s"], "back_swing": 0.5},
+            {"key_list": ["f"], "back_swing": 0.5, "duration": 0.5},
+            {"key_list": ["r"], "back_swing": 0.5},
+            {"key_list": ["t"], "back_swing": 0.5}
         ],
         "handle_boss": [
-            {"key_list": ["w"], "back_swing": 0.3}
+            {"key_list": ["q"], "back_swing": 3}
         ]
     },
     {
@@ -22,10 +24,10 @@ ALL_ROLE_CONFIG_LIST = [
         "role_status": "todo",
         "role_xy": [3 / 8, 1 / 3],
         "handle_buff": [
-            {"key_list": ["right", "right", "space"], "back_swing": 0.3},
-            {"key_list": ["up", "up", "space"], "back_swing": 0.3},
-            {"key_list": ["down", "left", "space"], "back_swing": 0.3},
-            {"key_list": ["e"], "back_swing": 0.3}
+            {"key_list": ["right", "right", "space"], "back_swing": 0.5},
+            {"key_list": ["up", "up", "space"], "back_swing": 0.5},
+            {"key_list": ["down", "left", "space"], "back_swing": 0.5},
+            {"key_list": ["e"], "back_swing": 0.5}
         ],
         "handle_monster": [
             {"key_list": ["s"], "back_swing": 1}
@@ -39,9 +41,8 @@ ALL_ROLE_CONFIG_LIST = [
         "role_status": "todo",
         "role_xy": [4 / 8, 1 / 3],
         "handle_buff": [
-            {"key_list": ["right", "right", "space"], "back_swing": 0.3},
-            {"key_list": ["up", "up", "space"], "back_swing": 0.5},
-            {"key_list": ["f"], "back_swing": 0.3}
+            {"key_list": ["right", "right", "space"], "back_swing": 2},
+            {"key_list": ["up", "up", "space"], "back_swing": 0.5}
         ],
         "handle_monster": [
             {"key_list": ["f"], "back_swing": 0.8}
@@ -56,10 +57,10 @@ ALL_ROLE_CONFIG_LIST = [
         "role_status": "todo",
         "role_xy": [5 / 8, 1 / 3],
         "handle_buff": [
-            {"key_list": ["right", "right", "space"], "back_swing": 0.3},
-            {"key_list": ["up", "up", "space"], "back_swing": 0.3},
-            {"key_list": ["down", "left", "space"], "back_swing": 0.3},
-            {"key_list": ["e"], "back_swing": 0.3}
+            {"key_list": ["right", "right", "space"], "back_swing": 0.5},
+            {"key_list": ["up", "up", "space"], "back_swing": 0.5},
+            {"key_list": ["down", "left", "space"], "back_swing": 0.5},
+            {"key_list": ["e"], "back_swing": 0.5}
         ],
         "handle_monster": [
             {"key_list": ["s"], "back_swing": 1}
@@ -91,7 +92,7 @@ ALL_ROLE_CONFIG_LIST = [
         "role_xy": [1 / 8, 2 / 3],
         "handle_buff": [
             {"key_list": ["q", "left"], "back_swing": 0.1},
-            {"key_list": ["right", "right", "space"], "back_swing": 0.3},
+            {"key_list": ["right", "right", "space"], "back_swing": 0.5},
             {"key_list": ["a"], "duration": 2, "back_swing": 0.1}
         ],
         "handle_monster": [
@@ -106,8 +107,8 @@ ALL_ROLE_CONFIG_LIST = [
         "role_status": "todo",
         "role_xy": [2 / 8, 2 / 3],
         "handle_buff": [
-            {"key_list": ["right", "right", "space"], "back_swing": 0.3},
-            {"key_list": ["r"], "back_swing": 0.3}
+            {"key_list": ["right", "right", "space"], "back_swing": 0.5},
+            {"key_list": ["r"], "back_swing": 0.5}
         ],
         "handle_monster": [
             {"key_list": ["e"], "back_swing": 1}
@@ -121,8 +122,8 @@ ALL_ROLE_CONFIG_LIST = [
         "role_status": "todo",
         "role_xy": [3 / 8, 2 / 3],
         "handle_buff": [
-            {"key_list": ["right", "right", "space"], "back_swing": 0.3},
-            {"key_list": ["r"], "back_swing": 0.3}
+            {"key_list": ["right", "right", "space"], "back_swing": 0.5},
+            {"key_list": ["r"], "back_swing": 0.5}
         ],
         "handle_monster": [
             {"key_list": ["e"], "back_swing": 1}
