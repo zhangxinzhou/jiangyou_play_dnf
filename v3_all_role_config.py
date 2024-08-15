@@ -1,13 +1,11 @@
-ALL_ROLE_CONFIG_LIST = [
-    {
+ALL_ROLE_SKILL_DICT = {
+    "modao": {
         "role_name": "modao",
-        "role_status": "todo",
         "role_xy": [2 / 8, 1 / 3],
         "handle_buff": [
             {"key_list": ["up", "right", "space"], "back_swing": 0.5},
-            {"key_list": ["up", "up", "space"], "back_swing": 2},
-            {"key_list": ["down", "space"], "back_swing": 0.5},
-            {"key_list": ["space"], "back_swing": 0.5}
+            {"key_list": ["up", "up", "space"], "back_swing": 1},
+            {"key_list": ["down", "up", "space"], "back_swing": 0.5},
         ],
         "handle_monster": [
             {"key_list": ["s"], "back_swing": 0.5},
@@ -19,9 +17,8 @@ ALL_ROLE_CONFIG_LIST = [
             {"key_list": ["q"], "back_swing": 3}
         ]
     },
-    {
+    "naima01": {
         "role_name": "naima01",
-        "role_status": "todo",
         "role_xy": [3 / 8, 1 / 3],
         "handle_buff": [
             {"key_list": ["right", "right", "space"], "back_swing": 0.5},
@@ -36,9 +33,8 @@ ALL_ROLE_CONFIG_LIST = [
             {"key_list": ["q", "a"], "back_swing": 2}
         ]
     },
-    {
+    "nailuo": {
         "role_name": "nailuo",
-        "role_status": "todo",
         "role_xy": [4 / 8, 1 / 3],
         "handle_buff": [
             {"key_list": ["right", "right", "space"], "back_swing": 2},
@@ -52,9 +48,8 @@ ALL_ROLE_CONFIG_LIST = [
             {"key_list": ["h"], "back_swing": 1}
         ]
     },
-    {
+    "naima02": {
         "role_name": "naima02",
-        "role_status": "todo",
         "role_xy": [5 / 8, 1 / 3],
         "handle_buff": [
             {"key_list": ["right", "right", "space"], "back_swing": 0.5},
@@ -69,9 +64,8 @@ ALL_ROLE_CONFIG_LIST = [
             {"key_list": ["q", "a"], "back_swing": 2}
         ]
     },
-    {
+    "zhaohuan": {
         "role_name": "zhaohuan",
-        "role_status": "todo",
         "role_xy": [6 / 8, 1 / 3],
         "handle_buff": [
             {"key_list": ["q"], "back_swing": 2},
@@ -86,53 +80,57 @@ ALL_ROLE_CONFIG_LIST = [
             {"key_list": ["y"], "back_swing": 2}
         ]
     },
-    {
+    "saber": {
         "role_name": "saber",
-        "role_status": "todo",
         "role_xy": [1 / 8, 2 / 3],
         "handle_buff": [
-            {"key_list": ["q", "left"], "back_swing": 0.1},
+            {"key_list": ["q", "left"], "duration": 0.3, "back_swing": 1},
             {"key_list": ["right", "right", "space"], "back_swing": 0.5},
-            {"key_list": ["a"], "duration": 2, "back_swing": 0.1}
+            {"key_list": ["a"], "duration": 2, "back_swing": 0.5}
         ],
         "handle_monster": [
-            {"key_list": ["s"], "duration": 0.8, "back_swing": 1}
+            {"key_list": ["s"], "duration": 0.8, "back_swing": 0.5},
+            {"key_list": ["f"], "duration": 0.8, "back_swing": 0.5},
+            {"key_list": ["h"], "duration": 0.8, "back_swing": 0.5}
         ],
         "handle_boss": [
-            {"key_list": ["up", "up", "down", "down", "z"], "back_swing": 2}
+            {"key_list": ["e"], "back_swing": 2}
         ]
     },
-    {
+    "zhanfa": {
         "role_name": "zhanfa",
-        "role_status": "todo",
         "role_xy": [2 / 8, 2 / 3],
         "handle_buff": [
-            {"key_list": ["right", "right", "space"], "back_swing": 0.5},
-            {"key_list": ["r"], "back_swing": 0.5}
+            {"key_list": ["right", "right", "space"], "back_swing": 1},
+            {"key_list": ["r"], "back_swing": 1}
         ],
         "handle_monster": [
-            {"key_list": ["e"], "back_swing": 1}
+            {"key_list": ["e"], "back_swing": 0.5},
+            {"key_list": ["g"], "back_swing": 0.5},
+            {"key_list": ["h"], "back_swing": 0.5}
         ],
         "handle_boss": [
             {"key_list": ["t"], "back_swing": 3}
         ]
     },
-    {
+    "papading": {
         "role_name": "papading",
-        "role_status": "todo",
         "role_xy": [3 / 8, 2 / 3],
         "handle_buff": [
             {"key_list": ["right", "right", "space"], "back_swing": 0.5},
-            {"key_list": ["r"], "back_swing": 0.5}
         ],
         "handle_monster": [
-            {"key_list": ["e"], "back_swing": 1}
+            {"key_list": ["a"], "back_swing": 0.5},
+            {"key_list": ["s"], "back_swing": 0.5},
+            {"key_list": ["g"], "back_swing": 0.5},
+            {"key_list": ["h"], "back_swing": 0.5}
         ],
         "handle_boss": [
-            {"key_list": ["t"], "back_swing": 3}
+            {"key_list": ["r"], "back_swing": 2},
+            {"key_list": ["e"], "back_swing": 3}
         ]
     }
-]
+}
 
 SKILL_BOX_X1 = 538
 SKILL_BOX_Y1 = 652

@@ -13,7 +13,7 @@ import win32con
 import win32gui
 from pynput import keyboard
 
-import v3_all_role_config as all_role_config
+import v3_all_role_config
 
 # 关闭安全模式
 pyautogui.FAILSAFE = False
@@ -65,6 +65,7 @@ def press_key(_key_list: list, _duration=0.0, _back_swing=0.3) -> None:
     :param _back_swing: 技能后摇时间,单位秒
     :return:
     """
+    print(f"_key_list={_key_list},_duration={_duration},_back_swing={_back_swing}")
     key_list_len = len(_key_list)
     if key_list_len <= 0:
         raise Exception("key_list must not be empty!")
@@ -208,7 +209,7 @@ def wait_label_exists(_label_list: list, _wait_second_limit=10):
         for _label in _label_list:
             if redis_has_label(_label):
                 # print('loading complete')
-                return None
+                return
 
 
 def wait_loading(wait_second_limit=10):
@@ -225,27 +226,42 @@ def redis_get_all_role_config_key():
     return _today_redis_key
 
 
-def redis_get_one_role_config(_role_name) -> dict:
-    _today_redis_key = redis_get_all_role_config_key()
-    _exist = REDIS_CONN.exists(_today_redis_key)
-    if _exist == 0:
-        all_role_config_list = all_role_config.ALL_ROLE_CONFIG_LIST
-        for one in all_role_config_list:
-            _key = _today_redis_key
-            _value = one['role_name']
-            _map = json.dumps(one)
-            REDIS_CONN.hset(_key, _value, _map)
-
-    _redis_val = REDIS_CONN.hget(_today_redis_key, _role_name)
-    if _redis_val is None:
-        print(f'miss role=[{_role_name}] config')
-
-    return json.loads(str(_redis_val, encoding='utf-8'))
+# def redis_get_one_role_config(_role_name) -> dict:
+#     _today_redis_key = redis_get_all_role_config_key()
+#     _exist = REDIS_CONN.exists(_today_redis_key)
+#     if _exist == 0:
+#         all_role_config_list = all_role_config.ALL_ROLE_CONFIG_LIST
+#         for one in all_role_config_list:
+#             _key = _today_redis_key
+#             _value = one['role_name']
+#             _map = json.dumps(one)
+#             REDIS_CONN.hset(_key, _value, _map)
+#
+#     _redis_val = REDIS_CONN.hget(_today_redis_key, _role_name)
+#     if _redis_val is None:
+#         print(f'miss role=[{_role_name}] config')
+#
+#     return json.loads(str(_redis_val, encoding='utf-8'))
 
 
 def redis_set_one_role_config(_one_role_config: dict) -> None:
     _today_redis_key = redis_get_all_role_config_key()
     REDIS_CONN.hset(_today_redis_key, json.dumps(_one_role_config))
+
+
+# 调试,打印执行到那个方法,方便观察卡在那个方法里面
+DEBUG_MODE = True
+
+
+def print_method_name(func):
+    def wrapper(*args, **kwargs):
+        _f_name = func.__name__
+        if DEBUG_MODE:
+            print(f'execute function [{_f_name:>30}]')
+        _result = func(*args, **kwargs)
+        return _result
+
+    return wrapper
 
 
 #######################################################
@@ -254,6 +270,7 @@ def redis_set_one_role_config(_one_role_config: dict) -> None:
 
 
 # 畅玩任务
+@print_method_name
 def handle_town_play_quest():
     wait_loading()
 
@@ -275,6 +292,7 @@ def handle_town_play_quest():
             redis_mouse_left_click_if_has_label('town_play_quest_icon_light')
 
 
+@print_method_name
 def to_select_role_ui():
     if redis_has_label('town_game_start_button'):
         return
@@ -290,6 +308,7 @@ def to_select_role_ui():
 
 
 # 进入副本
+@print_method_name
 def to_dungeon_arbitrator():
     for i in range(3):
         if not redis_has_label('town_select_menu_teleportation_light'):
@@ -302,6 +321,7 @@ def to_dungeon_arbitrator():
             press_key(_key_list=['right'], _duration=3)
 
 
+@print_method_name
 def handle_key_list(_key_list: list):
     if _key_list is None or len(_key_list) == 0:
         return
@@ -311,10 +331,11 @@ def handle_key_list(_key_list: list):
 
 
 # 上buff
+@print_method_name
 def handle_dungeon_stage_start(_role_name):
-    _one_role_config = redis_get_one_role_config(_role_name)
-    _handle_buff = _one_role_config.get('handle_buff')
+    _handle_buff = v3_all_role_config.ALL_ROLE_SKILL_DICT.get(_role_name).get('handle_buff')
     wait_label_exists(['dungeon_common_arrow'])
+    time.sleep(0.5)
     handle_key_list(_handle_buff)
 
 
@@ -322,8 +343,9 @@ def handle_dungeon_stage_start(_role_name):
 # 识别到道具,捡道具
 # 识别到
 # true 可以继续挑战,false 无法继续挑战
-def handle_dungeon_stage_end(_role_name) -> bool:
-    wait_label_exists(['dungeon_common_shop_box'])
+@print_method_name
+def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
+    # wait_label_exists(['dungeon_common_shop_box'])
     if redis_has_label('dungeon_common_shop_box'):
         # 维修武器
         press_key(_key_list=['s', 'space'], _back_swing=0.1)
@@ -336,12 +358,14 @@ def handle_dungeon_stage_end(_role_name) -> bool:
         for _i in range(20):
             press_key(_key_list=['x'])
 
-    if redis_has_label('dungeon_common_continue_normal'):
-        redis_mouse_left_click_if_has_label('dungeon_common_continue_normal')
-    if redis_has_label('dungeon_common_continue_gray'):
+    if _is_finish or redis_has_label('dungeon_common_continue_gray'):
         press_key(_key_list=['f12'])
+        return False
+    else:
+        return redis_mouse_left_click_if_has_label('dungeon_common_continue_normal')
 
 
+@print_method_name
 def role_run():
     pydirectinput.press('right')
     time.sleep(0.1)
@@ -349,22 +373,26 @@ def role_run():
     time.sleep(0.5)
     while True:
         if redis_fuzzy_search_label('monster') or redis_fuzzy_search_label('boss') or redis_fuzzy_search_label(
-                'star_box'):
+                'star_box') or redis_has_label(
+            'dungeon_common_shop_box' or redis_has_label('dungeon_common_continue_box')):
             pydirectinput.keyUp('right')
             return
         time.sleep(0.5)
 
 
+@print_method_name
 def handle_skill(_skill):
     _skill_key = _skill.get('key_list')[0]
     if redis_get_skill_able(_skill_key):
         press_key(_key_list=_skill.get('key_list'), _duration=_skill.get('duration'),
                   _back_swing=_skill.get('back_swing'))
-        time.sleep(0.5)
+        return True
+    return False
 
 
+@print_method_name
 def handle_dungeon_stage_clear(_role_name):
-    _one_role_config = redis_get_one_role_config(_role_name)
+    _one_role_config = v3_all_role_config.ALL_ROLE_SKILL_DICT.get(_role_name)
     _handle_monster = _one_role_config.get('handle_monster')
     _handle_boss = _one_role_config.get('handle_boss')
     while True:
@@ -381,35 +409,33 @@ def handle_dungeon_stage_clear(_role_name):
         else:
             if _has_dungeon_monster:
                 for _skill in _handle_monster:
-                    handle_skill(_skill)
+                    if handle_skill(_skill):
+                        break
             else:
                 for _skill in _handle_boss + _handle_monster:
-                    handle_skill(_skill)
+                    if handle_skill(_skill):
+                        break
 
 
-def handle_dungeon_one_round(_role_name):
-    _one_role_config = redis_get_one_role_config(_role_name)
-    _role_name = _one_role_config.get('role_name')
-    _role_status = _one_role_config.get('role_status')
-    _role_xy = _one_role_config.get('role_xy')
-    _handle_buff = _one_role_config.get('handle_buff')
-    _handle_monster = _one_role_config.get('handle_monster')
-    _handle_boss = _one_role_config.get('handle_boss')
+@print_method_name
+def handle_dungeon_one_round(_role_name, _is_finish=False) -> bool:
     # 上buff
     handle_dungeon_stage_start(_role_name)
     # 刷图
     handle_dungeon_stage_clear(_role_name)
     # 关卡结束
-    handle_dungeon_stage_end(_role_name)
-    pass
+    return handle_dungeon_stage_end(_role_name, _is_finish)
 
 
+@print_method_name
 def handle_dungeon_all_round(_role_name):
     _MAX_ROUND = 4
     for _round in range(_MAX_ROUND):
-        handle_dungeon_one_round(_role_name)
+        _is_finish = _round + 1 == _MAX_ROUND
+        handle_dungeon_one_round(_role_name, _is_finish)
 
 
+@print_method_name
 def to_target_dungeon(_dungeon_name='dungeon_arbitrator'):
     if _dungeon_name == 'dungeon_arbitrator':
         to_dungeon_arbitrator()
@@ -417,14 +443,10 @@ def to_target_dungeon(_dungeon_name='dungeon_arbitrator'):
         print(f'this is no [{_dungeon_name}]')
 
 
+@print_method_name
 def play_one_role(_role_name):
-    _one_role_config = redis_get_one_role_config(_role_name)
-    _role_name = _one_role_config.get('role_name')
-    _role_status = _one_role_config.get('role_status')
+    _one_role_config = v3_all_role_config.ALL_ROLE_SKILL_DICT.get(_role_name)
     _role_xy = _one_role_config.get('role_xy')
-    _handle_buff = _one_role_config.get('handle_buff')
-    _handle_monster = _one_role_config.get('handle_monster')
-    _handle_boss = _one_role_config.get('handle_boss')
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] start')
     # 进入选择角色ui
     to_select_role_ui()
@@ -446,7 +468,6 @@ def play_one_role(_role_name):
 
 
 if __name__ == '__main__':
-    REDIS_CONN.flushall()
     time.sleep(1)
 
     # 被其他窗口遮挡，调用后放到最前面
@@ -460,8 +481,5 @@ if __name__ == '__main__':
         # play_one_role(role_name)
         pass
 
-    role_name = 'naima02'
-    # to_dungeon_arbitrator()
-    handle_dungeon_stage_start(role_name)
-    handle_dungeon_stage_clear(role_name)
-    handle_dungeon_stage_end(role_name)
+    role_name = 'papading'
+    handle_dungeon_all_round(role_name)
