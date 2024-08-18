@@ -1,6 +1,7 @@
 import ctypes
 import ctypes.wintypes
 import json
+import os
 import sys
 import time
 
@@ -11,6 +12,7 @@ import supervision as sv
 import win32gui
 from PyQt5.QtGui import QImage
 from PyQt5.QtWidgets import QApplication
+from qtconsole.mainwindow import background
 from ultralytics import YOLO
 
 import v3_all_role_config
@@ -58,15 +60,39 @@ def show_mouse_position(_event, _x, _y, _flags, _params):
 
 
 # 判断是不是灰色图
-def calc_gray_confidence(_cv2_mat):
-    # 虽然不知道是什么原理,但是真的好用 来源 https://stackoverflow.org.cn/questions/64038736
-    hsv = cv2.cvtColor(_cv2_mat, cv2.COLOR_BGR2HSV)
-    # define range of gray color in HSV
-    lower_gray = np.array([0, 0, 0])
-    upper_gray = np.array([255, 10, 255])
-    # Threshold the HSV image to get only gray colors
-    mask = cv2.inRange(hsv, lower_gray, upper_gray)
-    return np.count_nonzero(mask) / mask.size
+# def calc_gray_confidence(_cv2_mat):
+#     # 虽然不知道是什么原理,但是真的好用 来源 https://stackoverflow.org.cn/questions/64038736
+#     hsv = cv2.cvtColor(_cv2_mat, cv2.COLOR_BGR2HSV)
+#     # define range of gray color in HSV
+#     lower_gray = np.array([0, 0, 0])
+#     upper_gray = np.array([255, 10, 255])
+#     # Threshold the HSV image to get only gray colors
+#     mask = cv2.inRange(hsv, lower_gray, upper_gray)
+#     _gray_val = np.count_nonzero(mask) / mask.size
+#     return _gray_val
+
+
+def calc_yellow_confidence(_cv2_mat):
+    _hsv = cv2.cvtColor(_cv2_mat, cv2.COLOR_BGR2HSV)
+    _lower_yellow = np.array([20, 100, 100])
+    _upper_yellow = np.array([30, 255, 255])
+    _mask_yellow = cv2.inRange(_hsv, _lower_yellow, _upper_yellow)
+    _count_yellow = cv2.countNonZero(_mask_yellow)
+    _rate_yellow = _count_yellow / _mask_yellow.size
+
+    # _text_yellow = f'_count_yellow=[{_count_yellow}],_rate_yellow=[{_rate_yellow}]'
+    # print('*' * 100)
+    # print(_text_yellow)
+    # cv2.imshow('_res_yellow', _mask_yellow)
+
+    # _lower_gray = np.array([0, 0, 0])
+    # _upper_gray = np.array([255, 10, 255])
+    # _mask_gray = cv2.inRange(_hsv, _lower_gray, _upper_gray)
+    # _res_gray = cv2.bitwise_and(_cv2_mat, _cv2_mat, mask=_mask_gray)
+    # cv2.imshow('_mask_gray', _mask_gray)
+    # cv2.imshow('_res_gray', _res_gray)
+
+    return _rate_yellow > 0.04
 
 
 COLOR_RED = (0, 0, 255)
@@ -87,8 +113,7 @@ def handle_skill(_cv2_mat):
         _pt1, _pt2 = (_pt1_x, _pt1_y), (_pt2_x, _pt2_y)
         # 判断技能是否可用
         _skill_icon = _cv2_mat[_pt1_y:_pt2_y, _pt1_x:_pt2_x]
-        _gray_confidence = calc_gray_confidence(_skill_icon)
-        _one_y = _gray_confidence < 0.6
+        _one_y = calc_yellow_confidence(_skill_icon)
         _all_count += 1
         if _one_y:
             _all_count_y += 1
@@ -205,7 +230,8 @@ if __name__ == '__main__':
             cv2.putText(cv2_mat, text=text, org=(20, 20), fontFace=cv2.FONT_HERSHEY_COMPLEX, fontScale=0.5,
                         color=(0, 0, 255))
 
-            position_txt = f'x=[{mouse_x:>4}] y=[{mouse_y:>4}] color=[{cv2_mat[mouse_y][mouse_x]}]'
+            hsv = cv2.cvtColor(cv2_mat, cv2.COLOR_BGR2HSV)
+            position_txt = f'x=[{mouse_x:>4}] y=[{mouse_y:>4}] color=[{cv2_mat[mouse_y][mouse_x]}] hsv=[{hsv[mouse_y][mouse_x]}]'
             cv2.putText(cv2_mat, text=position_txt, org=(20, 20 + 40), fontFace=cv2.FONT_HERSHEY_COMPLEX, fontScale=0.5,
                         color=(0, 0, 255))
             handle_skill(cv2_mat)

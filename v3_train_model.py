@@ -11,7 +11,7 @@ if __name__ == '__main__':
     model = YOLO('yolov8x.pt')
 
     yaml_path = '_v3_datasets_dnf_arbitrator.yaml'
-    results = model.train(data=yaml_path, epochs=200)
+    results = model.train(data=yaml_path, epochs=1000)
     print("*" * 100)
     print(results)
 

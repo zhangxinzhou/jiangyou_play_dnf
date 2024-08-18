@@ -55,12 +55,14 @@ names:
   36: ___dungeon_arbitrator____
   37: dungeon_arbitrator_icon
   38: dungeon_arbitrator_boss_box
-  39: dungeon_arbitrator_monster_rock
-  40: dungeon_arbitrator_monster_girl
-  41: dungeon_arbitrator_star_box_ball
-  42: dungeon_arbitrator_star_box_cube
-  43: ___dungeon_library____
-  44: dungeon_library_icon
-  45: dungeon_library_monster_boy
-  46: dungeon_library_monster_girl
-  47: dungeon_library_boss_box
+  39: dungeon_arbitrator_boss_insect
+  40: dungeon_arbitrator_boss_knight
+  41: dungeon_arbitrator_monster_rock
+  42: dungeon_arbitrator_monster_girl
+  43: dungeon_arbitrator_star_box_ball
+  44: dungeon_arbitrator_star_box_cube
+  45: ___dungeon_library____
+  46: dungeon_library_icon
+  47: dungeon_library_monster_boy
+  48: dungeon_library_monster_girl
+  49: dungeon_library_boss_box
