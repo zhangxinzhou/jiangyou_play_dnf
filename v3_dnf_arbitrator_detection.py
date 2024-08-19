@@ -138,11 +138,6 @@ if __name__ == '__main__':
     model = YOLO(model_path)
     print('end loading model')
 
-    last_n_label_max_size = 10
-    last_n_label_list = []
-    # 最近n个预测结果
-    last_n_result_max_size = 3
-    last_n_result_list = []
     prev_time = time.time()
     while True:
         cost_time = time.time() - prev_time
@@ -161,59 +156,34 @@ if __name__ == '__main__':
         result = results[0]
         detections = sv.Detections.from_ultralytics(result)
         labels = [model.model.names[class_id] for class_id in detections.class_id]
-        if len(last_n_label_list) > last_n_label_max_size:
-            last_n_label_list.pop(0)
-        last_n_label_list.append(set(labels))
-        last_n_label_list_size = len(last_n_label_list)
-        label_rate_dict = {}
-        tmp_dict = {}
-        for i in last_n_label_list:
-            for j in i:
-                count = tmp_dict.get(j, 0)
-                count += 1
-                tmp_dict[j] = count
-        set_all = label_rate_dict.keys() | tmp_dict.keys()
-        for k in set_all:
-            count = tmp_dict.get(k, 0)
-            rate = count / last_n_label_list_size
-            label_rate_dict[k] = rate
-            print(k, rate)
-        # 存在概率
-        redis_conn.set(name='labels_exists_dict', value=json.dumps(label_rate_dict))
 
         # 写入redis的值
-        label_dict = {}
+        labels_detail_list = []
+        labels_detail_dict = {}
         if len(labels) > 0:
-            result_json_obj = json.loads(result.tojson())
-            # 每个分类中找出一个概率最大的即可
-            last_n_result_list_size = len(last_n_result_list)
-            if last_n_result_list_size > last_n_result_max_size:
-                last_n_result_list.pop(0)
-            last_n_result_list.append(result_json_obj)
-
-            for i in last_n_result_list:
-                for j in i:
-                    label_name = j['name']
-                    label_prob = j['confidence']
-                    label_box = j['box']
-                    label_box_x_center = int((label_box['x1'] + label_box['x2']) / 2)
-                    label_box_y_center = int((label_box['y1'] + label_box['y2']) / 2)
-                    label_box_center = [label_box_x_center, label_box_y_center]
-                    prev_label_prob = 0
-                    if label_prob > label_dict.get(label_name, {}).get(label_prob, 0):
-                        if label_dict.get(label_name) is None:
-                            label_dict[label_name] = {}
-                        label_dict[label_name]['label_name'] = label_name
-                        label_dict[label_name]['label_prob'] = label_prob
-                        label_dict[label_name]['label_box'] = label_box
-                        label_dict[label_name]['label_box_center'] = label_box_center
-            for k, v in label_dict.items():
-                print(k, v)
+            labels_detail_list = json.loads(result.tojson())
+            for one in labels_detail_list:
+                label_name = one['name']
+                label_prob = one['confidence']
+                label_box = one['box']
+                label_box_x_center = int((label_box['x1'] + label_box['x2']) / 2)
+                label_box_y_center = int((label_box['y1'] + label_box['y2']) / 2)
+                label_box_center = [label_box_x_center, label_box_y_center]
+                prev_label_prob = 0
+                if label_prob > labels_detail_dict.get(label_name, {}).get('label_prob', 0):
+                    if labels_detail_dict.get(label_name) is None:
+                        labels_detail_dict[label_name] = {}
+                    labels_detail_dict[label_name]['label_name'] = label_name
+                    labels_detail_dict[label_name]['label_prob'] = label_prob
+                    labels_detail_dict[label_name]['label_box'] = label_box
+                    labels_detail_dict[label_name]['label_box_center'] = label_box_center
+            for k, v in labels_detail_dict.items():
                 # 画出坐标
                 x, y = v['label_box_center']
                 cv2.line(cv2_mat, pt1=(x, y - 100), pt2=(x, y + 100), color=(0, 0, 255), thickness=3)
                 cv2.line(cv2_mat, pt1=(x - 100, y), pt2=(x + 100, y), color=(0, 0, 255), thickness=3)
-        redis_conn.set(name='labels_detail_dict', value=json.dumps(label_dict))
+        redis_conn.set(name='labels_detail_list', value=json.dumps(labels_detail_list))
+        redis_conn.set(name='labels_detail_dict', value=json.dumps(labels_detail_dict))
 
         # 需要查看监测的结果,就将show_window改为True
         show_window = True

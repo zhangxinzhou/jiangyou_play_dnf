@@ -129,7 +129,23 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["r"], "back_swing": 2},
             {"key_list": ["e"], "back_swing": 3}
         ]
-    }
+    },
+    "naima03": {
+        "role_name": "naima02",
+        "role_xy": [4 / 8, 2 / 3],
+        "handle_buff": [
+            {"key_list": ["right", "right", "space"], "back_swing": 0.8},
+            {"key_list": ["up", "up", "space"], "back_swing": 0.8},
+            {"key_list": ["down", "left", "space"], "back_swing": 0.8},
+            {"key_list": ["e"], "back_swing": 0.8}
+        ],
+        "handle_monster": [
+            {"key_list": ["s"], "back_swing": 1}
+        ],
+        "handle_boss": [
+            {"key_list": ["q", "a"], "back_swing": 2}
+        ]
+    },
 }
 
 SKILL_BOX_X1 = 538

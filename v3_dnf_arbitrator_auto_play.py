@@ -374,8 +374,14 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
         # 数字0 移动物品 捡东西
         press_key(_key_list=['0'], _back_swing=0.5)
         # 捡东西
+        _item_miss = 0
         for _i in range(20):
             press_key(_key_list=['x'])
+            if not redis_has_label('dungeon_common_item'):
+                _item_miss += 1
+            # 三次检测到没东西就退出
+            if _item_miss >= 3:
+                break
 
     if _is_finish or redis_has_label('dungeon_common_continue_gray'):
         press_key(_key_list=['f12'])
@@ -386,6 +392,13 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
 
 @print_method_name
 def role_run():
+    # 退出条件
+    if redis_fuzzy_search_label('monster') or redis_fuzzy_search_label(
+            'boss') or redis_fuzzy_search_label(
+        'star_box') or redis_has_label(
+        'dungeon_common_shop_box' or redis_has_label('dungeon_common_continue_box')):
+        return
+
     # 判断是否可以跑
     _start_time = time.time()
     _sleep_time = 0.3
@@ -401,8 +414,9 @@ def role_run():
     pydirectinput.keyDown('right')
     time.sleep(_sleep_time)
     while True:
-        if redis_fuzzy_search_label('monster') or redis_fuzzy_search_label('boss') or redis_fuzzy_search_label(
-                'star_box') or redis_has_label(
+        if redis_fuzzy_search_label('monster') or redis_fuzzy_search_label(
+                'boss') or redis_fuzzy_search_label(
+            'star_box') or redis_has_label(
             'dungeon_common_shop_box' or redis_has_label('dungeon_common_continue_box')):
             pydirectinput.keyUp('right')
             return
@@ -410,41 +424,47 @@ def role_run():
 
 
 @print_method_name
-def handle_skill(_skill):
-    _skill_key = _skill.get('key_list')[0]
-    if redis_get_skill_able(_skill_key):
-        press_key(_key_list=_skill.get('key_list'), _duration=_skill.get('duration'),
-                  _back_swing=_skill.get('back_swing'))
-        time.sleep(0.5)
-        return True
-    return False
+def handle_monster(_role_name):
+    _skill_list = v3_all_role_config.ALL_ROLE_SKILL_DICT.get(_role_name).get('handle_monster')
+    for _skill_one in _skill_list:
+        _skill_key = _skill_one.get('key_list')[0]
+        if redis_get_skill_able(_skill_key):
+            press_key(_key_list=_skill_one.get('key_list'),
+                      _duration=_skill_one.get('duration'),
+                      _back_swing=_skill_one.get('back_swing'))
+            return
+
+
+@print_method_name
+def handle_boss(_role_name):
+    _skill_list = v3_all_role_config.ALL_ROLE_SKILL_DICT.get(_role_name).get('handle_boss')
+    _count = 0
+    for _skill_one in _skill_list:
+        _skill_key = _skill_one.get('key_list')[0]
+        if redis_get_skill_able(_skill_key):
+            press_key(_key_list=_skill_one.get('key_list'),
+                      _duration=_skill_one.get('duration'),
+                      _back_swing=_skill_one.get('back_swing'))
+            time.sleep(0.3)
+            _count += 1
+
+    if _count == 0:
+        handle_monster(_role_name)
 
 
 @print_method_name
 def handle_dungeon_stage_clear(_role_name):
-    _one_role_config = v3_all_role_config.ALL_ROLE_SKILL_DICT.get(_role_name)
-    _handle_monster = _one_role_config.get('handle_monster')
-    _handle_boss = _one_role_config.get('handle_boss')
     while True:
-        _has_dungeon_shop_box = redis_has_label('dungeon_common_shop_box')
-        _has_dungeon_monster = redis_fuzzy_search_label('monster')
-        _has_dungeon_boss = redis_fuzzy_search_label('boss')
-
-        if _has_dungeon_shop_box:
-            break
-
-        _has_enemy = _has_dungeon_monster or _has_dungeon_boss
-        if not _has_enemy:
-            role_run()
+        # 退出
+        if redis_has_label('dungeon_common_shop_box'):
+            return
+        # 打怪,打boss和奔跑
+        if redis_fuzzy_search_label('monster'):
+            handle_monster(_role_name)
+        elif redis_fuzzy_search_label('boss'):
+            handle_boss(_role_name)
         else:
-            if _has_dungeon_monster:
-                for _skill in _handle_monster:
-                    if handle_skill(_skill):
-                        break
-            else:
-                for _skill in _handle_boss + _handle_monster:
-                    if handle_skill(_skill):
-                        break
+            role_run()
 
 
 @print_method_name
@@ -459,7 +479,7 @@ def handle_dungeon_one_round(_role_name, _is_finish=False) -> bool:
 
 @print_method_name
 def handle_dungeon_all_round(_role_name):
-    _MAX_ROUND = 2
+    _MAX_ROUND = 4
     for _round in range(_MAX_ROUND):
         _is_finish = _round + 1 == _MAX_ROUND
         handle_dungeon_one_round(_role_name, _is_finish)
@@ -516,13 +536,13 @@ def play():
 
     role_name_list = [
         {'role_name': 'modao', 'dungeon_status': 'done'},
-        {'role_name': 'naima01', 'dungeon_status': 'todo'},
+        {'role_name': 'naima01', 'dungeon_status': 'done'},
         {'role_name': 'nailuo', 'dungeon_status': 'done'},
         {'role_name': 'naima02', 'dungeon_status': 'done'},
         {'role_name': 'zhaohuan', 'dungeon_status': 'done'},
         {'role_name': 'saber', 'dungeon_status': 'done'},
         {'role_name': 'zhanfa', 'dungeon_status': 'done'},
-        {'role_name': 'papading', 'dungeon_status': 'done'},
+        {'role_name': 'naima03', 'dungeon_status': 'todo'},
     ]
 
     for one_config in role_name_list:
