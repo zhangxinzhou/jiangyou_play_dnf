@@ -373,21 +373,22 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
         press_key(_key_list=['esc'], _back_swing=0.5)
         # 数字0 移动物品 捡东西
         press_key(_key_list=['0'], _back_swing=0.5)
-        # 捡东西
-        _item_miss = 0
+        # 捡东西(墙角检测不到物品,因此就这样吧)
         for _i in range(20):
             press_key(_key_list=['x'])
-            if not redis_has_label('dungeon_common_item'):
-                _item_miss += 1
-            # 三次检测到没东西就退出
-            if _item_miss >= 3:
-                break
 
-    if _is_finish or redis_has_label('dungeon_common_continue_gray'):
+    if _is_finish:
         press_key(_key_list=['f12'])
         return False
+    elif redis_has_label('dungeon_common_continue_gray'):
+        press_key(_key_list=['f12'])
+        return False
+    elif redis_has_label('dungeon_common_continue_normal'):
+        press_key(_key_list=['f10'])
+        return True
     else:
-        return redis_mouse_left_click_if_has_label('dungeon_common_continue_normal')
+        press_key(_key_list=['f12'])
+        return False
 
 
 @print_method_name
@@ -474,15 +475,22 @@ def handle_dungeon_one_round(_role_name, _is_finish=False) -> bool:
     # 刷图
     handle_dungeon_stage_clear(_role_name)
     # 关卡结束
-    return handle_dungeon_stage_end(_role_name, _is_finish)
+    _is_continue = handle_dungeon_stage_end(_role_name, _is_finish)
+    return _is_continue
 
 
 @print_method_name
 def handle_dungeon_all_round(_role_name):
     _MAX_ROUND = 4
+    _start_time = time.time()
     for _round in range(_MAX_ROUND):
         _is_finish = _round + 1 == _MAX_ROUND
-        handle_dungeon_one_round(_role_name, _is_finish)
+        _is_continue = handle_dungeon_one_round(_role_name, _is_finish)
+        _cost = time.time() - _start_time
+        print(
+            f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] round=[{_round:<2}] cost=[{_cost:.2f}]')
+        if not _is_continue:
+            return
 
 
 @print_method_name
@@ -540,9 +548,9 @@ def play():
         {'role_name': 'nailuo', 'dungeon_status': 'done'},
         {'role_name': 'naima02', 'dungeon_status': 'done'},
         {'role_name': 'zhaohuan', 'dungeon_status': 'done'},
-        {'role_name': 'saber', 'dungeon_status': 'done'},
+        {'role_name': 'saber', 'dungeon_status': 'todo'},
         {'role_name': 'zhanfa', 'dungeon_status': 'done'},
-        {'role_name': 'naima03', 'dungeon_status': 'todo'},
+        {'role_name': 'naima03', 'dungeon_status': 'done'},
     ]
 
     for one_config in role_name_list:
