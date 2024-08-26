@@ -212,13 +212,27 @@ def wait_label_exists(_label_list: list, _wait_second_limit=10):
     _start_time = time.time()
     while True:
         time.sleep(0.5)
-        if time.time() - _start_time > _wait_second_limit:
-            print(f'wait label [{_label_list}] too long, skip')
+        _cost = time.time() - _start_time
+        if _cost > _wait_second_limit:
+            print(f'wait label [{_label_list}] [{_cost:.2f}] s, skip')
             return
         for _label in _label_list:
             if redis_has_label(_label):
                 # print('loading complete')
                 return
+
+
+def wait_all_skill_enable(_wait_second_limit=3):
+    # 等待界面加载loading
+    _start_time = time.time()
+    while True:
+        time.sleep(0.5)
+        _cost = time.time() - _start_time
+        if _cost > _wait_second_limit:
+            print(f'wait wait_all_skill_enable [{_cost:.2f}] s, skip')
+            return
+        if redis_get_skill_able('all'):
+            return
 
 
 def wait_loading(wait_second_limit=10):
@@ -315,28 +329,33 @@ def to_select_role_ui():
 
 # 进入副本
 @print_method_name
-def to_dungeon_arbitrator():
+def to_dungeon_arbitrator(_dungeon_icon):
     try_times = 3
     sleep_second = 0.3
+    # esc打开菜单
     for i in range(try_times):
         time.sleep(sleep_second)
         if not redis_has_label('town_select_menu_teleportation_light'):
             press_key(_key_list=['esc'], _back_swing=0.1)
 
+    # 点击传送阵
     for i in range(try_times):
         time.sleep(sleep_second)
         if redis_mouse_left_click_if_has_label('town_select_menu_teleportation_light'):
             break
 
+    # 传送到目标副本区域
     for i in range(try_times):
         time.sleep(sleep_second)
-        if redis_mouse_left_click_if_has_label('dungeon_arbitrator_icon'):
+        if redis_mouse_left_click_if_has_label(_dungeon_icon):
             break
 
+    # 进入副本,选择进入的地下城,点击进入地下城
     for i in range(try_times):
         time.sleep(sleep_second)
         press_key(_key_list=['right'], _duration=2)
-        if redis_mouse_left_click_if_has_label('dungeon_arbitrator_icon'):
+        if redis_mouse_left_click_if_has_label(_dungeon_icon):
+            press_key(_key_list=['space'], _back_swing=0.1)
             break
 
 
@@ -353,7 +372,7 @@ def handle_key_list(_key_list: list):
 @print_method_name
 def handle_dungeon_stage_start(_role_name):
     _handle_buff = v3_all_role_config.ALL_ROLE_SKILL_DICT.get(_role_name).get('handle_buff')
-    wait_label_exists(['dungeon_common_arrow'])
+    wait_all_skill_enable()
     time.sleep(0.5)
     handle_key_list(_handle_buff)
 
@@ -433,6 +452,7 @@ def handle_monster(_role_name):
             press_key(_key_list=_skill_one.get('key_list'),
                       _duration=_skill_one.get('duration'),
                       _back_swing=_skill_one.get('back_swing'))
+            time.sleep(0.5)
             return
 
 
@@ -446,7 +466,7 @@ def handle_boss(_role_name):
             press_key(_key_list=_skill_one.get('key_list'),
                       _duration=_skill_one.get('duration'),
                       _back_swing=_skill_one.get('back_swing'))
-            time.sleep(0.3)
+            time.sleep(0.5)
             _count += 1
 
     if _count == 0:
@@ -459,11 +479,15 @@ def handle_dungeon_stage_clear(_role_name):
         # 退出
         if redis_has_label('dungeon_common_shop_box'):
             return
-        # 打怪,打boss和奔跑
-        if redis_fuzzy_search_label('monster'):
+        # 打怪
+        elif redis_fuzzy_search_label('monster'):
             handle_monster(_role_name)
+        # 打boss
         elif redis_fuzzy_search_label('boss'):
             handle_boss(_role_name)
+        # 移动
+        elif redis_has_label('dungeon_common_arrow'):
+            role_run()
         else:
             role_run()
 
@@ -481,32 +505,49 @@ def handle_dungeon_one_round(_role_name, _is_finish=False) -> bool:
 
 @print_method_name
 def handle_dungeon_all_round(_role_name):
-    _MAX_ROUND = 4
+    _one_role_dungeon_list = v3_all_role_config.ALL_ROLE_DUNGEON_DICT.get(_role_name)
     _start_time = time.time()
-    for _round in range(_MAX_ROUND):
-        _is_finish = _round + 1 == _MAX_ROUND
-        _is_continue = handle_dungeon_one_round(_role_name, _is_finish)
-        _cost = time.time() - _start_time
-        print(
-            f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] round=[{_round:<2}] cost=[{_cost:.2f}]')
-        if not _is_continue:
-            return
+    for _one_role_dungeon in _one_role_dungeon_list:
+        _dungeon_name = _one_role_dungeon.get("dungeon_name")
+        _dungeon_icon = _one_role_dungeon.get("dungeon_icon")
+        _dungeon_status = _one_role_dungeon.get("dungeon_status")
+        _dungeon_round = _one_role_dungeon.get("dungeon_round")
+
+        if _dungeon_status == 'todo':
+            # 进入目标副本
+            to_dungeon_arbitrator(_dungeon_icon)
+            _MAX_ROUND = _dungeon_round
+
+            for _round in range(_MAX_ROUND):
+                _is_finish = _round + 1 == _MAX_ROUND
+                _is_continue = handle_dungeon_one_round(_role_name, _is_finish)
+                _cost = time.time() - _start_time
+                print(
+                    f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name}] round=[{_round:>02}] cost=[{_cost:.2f}] s')
+                if not _is_continue:
+                    break
+        else:
+            print(
+                f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name}] has done, skip')
 
 
 @print_method_name
-def to_target_dungeon(_dungeon_name='dungeon_arbitrator'):
-    if _dungeon_name == 'dungeon_arbitrator':
-        to_dungeon_arbitrator()
+def to_target_dungeon(_dungeon_icon):
+    if _dungeon_icon is not None:
+        to_dungeon_arbitrator(_dungeon_icon=_dungeon_icon)
     else:
-        print(f'this is no [{_dungeon_name}]')
+        print(f'_dungeon_icon can not be None, skip')
 
 
 @print_method_name
 def play_one_role(_role_name):
-    _start_time = time.time()
-    _one_role_config = v3_all_role_config.ALL_ROLE_SKILL_DICT.get(_role_name)
-    _role_xy = _one_role_config.get('role_xy')
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] start')
+    # 开始时间
+    _start_time = time.time()
+    # 获取角色配置
+    _one_role_skill_config = v3_all_role_config.ALL_ROLE_SKILL_DICT.get(_role_name)
+    _role_xy = _one_role_skill_config.get('role_xy')
+
     # 进入选择角色ui
     to_select_role_ui()
     wait_label_exists(['town_game_start_button'])
@@ -521,19 +562,19 @@ def play_one_role(_role_name):
     mouse_left_double_click()
     # 畅玩任务,领取奖励
     handle_town_play_quest()
-    # 进入目标副本
-    to_dungeon_arbitrator()
     # 刷图
     handle_dungeon_all_round(_role_name)
     # 畅玩任务,领取奖励
     handle_town_play_quest()
     _cost = time.time() - _start_time
-    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] end, cost=[{_cost:.2f}]')
+    print(
+        f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] end, cost=[{_cost:.2f}] s')
 
 
 def play():
-    # 启动docker的redis
-    os.system("docker start redis_zxz")
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] program start')
+    # 开始时间
+    _start_time = time.time()
     time.sleep(1)
 
     # 被其他窗口遮挡，调用后放到最前面
@@ -542,31 +583,26 @@ def play():
     win32gui.ShowWindow(WINDOW_HWND, win32con.SW_RESTORE)
     time.sleep(1)
 
-    role_name_list = [
-        {'role_name': 'modao', 'dungeon_status': 'done'},
-        {'role_name': 'naima01', 'dungeon_status': 'done'},
-        {'role_name': 'nailuo', 'dungeon_status': 'done'},
-        {'role_name': 'naima02', 'dungeon_status': 'done'},
-        {'role_name': 'zhaohuan', 'dungeon_status': 'done'},
-        {'role_name': 'saber', 'dungeon_status': 'todo'},
-        {'role_name': 'zhanfa', 'dungeon_status': 'done'},
-        {'role_name': 'naima03', 'dungeon_status': 'done'},
-    ]
-
-    for one_config in role_name_list:
-        role_name = one_config.get('role_name')
-        dungeon_status = one_config.get('dungeon_status')
-        if dungeon_status == 'done':
-            print(f'role_name=[{role_name:<20} has {dungeon_status}, skip]')
-            continue
+    role_name_list = ["modao", "naima01", "nailuo", "naima02", "zhaohuan", "saber", "zhanfa", "papading", "naima03"]
+    # =============================play开始===============================
+    for role_name in role_name_list:
         play_one_role(role_name)
+    # =============================play开始===============================
 
+    # =============================测试开始===============================
     # 测试单个角色刷图
     # handle_dungeon_all_round('papading')
     # 测试单个角色
     # play_one_role('naima02')
     # 测试移动到地下城仲裁者
-    # to_dungeon_arbitrator()
+    # to_dungeon_arbitrator('dungeon_arbitrator_icon')
+    # 测试移动到地下城缥缈店书库
+    # to_dungeon_arbitrator('dungeon_library_icon')
+    # =============================测试结束===============================
+
+    # 计算耗时
+    _cost = time.time() - _start_time
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] program end, cost=[{_cost:.2f}] s')
 
 
 if __name__ == '__main__':

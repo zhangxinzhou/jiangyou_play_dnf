@@ -14,7 +14,8 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["t"], "back_swing": 0.5}
         ],
         "handle_boss": [
-            {"key_list": ["q"], "back_swing": 3}
+            {"key_list": ["t"], "back_swing": 1},
+            {"key_list": ["r"], "back_swing": 1}
         ]
     },
     "naima01": {
@@ -94,7 +95,8 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["h"], "duration": 0.8, "back_swing": 0.5}
         ],
         "handle_boss": [
-            {"key_list": ["e"], "back_swing": 2}
+            {"key_list": ["g"], "back_swing": 2},
+            {"key_list": ["r"], "back_swing": 5}
         ]
     },
     "zhanfa": {
@@ -146,6 +148,117 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["q", "a"], "back_swing": 2}
         ]
     },
+}
+
+ALL_ROLE_DUNGEON_DICT = {
+    "modao": [
+        {
+            "dungeon_name": "arbitrator",
+            "dungeon_icon": "dungeon_arbitrator_icon",
+            "dungeon_status": "done",
+            "dungeon_round": 1
+        }, {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "done",
+            "dungeon_round": 1
+        }],
+    "naima01": [
+        {
+            "dungeon_name": "arbitrator",
+            "dungeon_icon": "dungeon_arbitrator_icon",
+            "dungeon_status": "done",
+            "dungeon_round": 2
+        }, {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "done",
+            "dungeon_round": 2
+        }],
+    "nailuo": [
+        {
+            "dungeon_name": "arbitrator",
+            "dungeon_icon": "dungeon_arbitrator_icon",
+            "dungeon_status": "done",
+            "dungeon_round": 2
+        }, {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "done",
+            "dungeon_round": 2
+        }],
+    "naima02": [
+        {
+            "dungeon_name": "arbitrator",
+            "dungeon_icon": "dungeon_arbitrator_icon",
+            "dungeon_status": "done",
+            "dungeon_round": 2
+        }, {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "done",
+            "dungeon_round": 2
+        }],
+    "zhaohuan": [
+        {
+            "dungeon_name": "arbitrator",
+            "dungeon_icon": "dungeon_arbitrator_icon",
+            "dungeon_status": "done",
+            "dungeon_round": 2
+        }, {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 2
+        }],
+    "saber": [
+        {
+            "dungeon_name": "arbitrator",
+            "dungeon_icon": "dungeon_arbitrator_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 2
+        }, {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 2
+        }],
+    "zhanfa": [
+        {
+            "dungeon_name": "arbitrator",
+            "dungeon_icon": "dungeon_arbitrator_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 2
+        }, {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 2
+        }],
+    "papading": [
+        {
+            "dungeon_name": "arbitrator",
+            "dungeon_icon": "dungeon_arbitrator_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 4
+        }, {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 0
+        }],
+    "naima03": [
+        {
+            "dungeon_name": "arbitrator",
+            "dungeon_icon": "dungeon_arbitrator_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 4
+        }, {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 0
+        }],
 }
 
 SKILL_BOX_X1 = 538

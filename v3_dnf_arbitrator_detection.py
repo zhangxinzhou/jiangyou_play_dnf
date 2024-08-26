@@ -1,7 +1,6 @@
 import ctypes
 import ctypes.wintypes
 import json
-import os
 import sys
 import time
 
@@ -12,7 +11,6 @@ import supervision as sv
 import win32gui
 from PyQt5.QtGui import QImage
 from PyQt5.QtWidgets import QApplication
-from qtconsole.mainwindow import background
 from ultralytics import YOLO
 
 import v3_all_role_config
@@ -78,7 +76,7 @@ def calc_yellow_confidence(_cv2_mat):
     _upper_yellow = np.array([30, 255, 255])
     _mask_yellow = cv2.inRange(_hsv, _lower_yellow, _upper_yellow)
     _count_yellow = cv2.countNonZero(_mask_yellow)
-    _rate_yellow = _count_yellow / _mask_yellow.size
+    _percent_yellow = _count_yellow / _mask_yellow.size
 
     # _text_yellow = f'_count_yellow=[{_count_yellow}],_rate_yellow=[{_rate_yellow}]'
     # print('*' * 100)
@@ -92,7 +90,7 @@ def calc_yellow_confidence(_cv2_mat):
     # cv2.imshow('_mask_gray', _mask_gray)
     # cv2.imshow('_res_gray', _res_gray)
 
-    return _rate_yellow > 0.04
+    return _percent_yellow > 0.04
 
 
 COLOR_RED = (0, 0, 255)
@@ -205,7 +203,7 @@ if __name__ == '__main__':
             cv2.putText(cv2_mat, text=position_txt, org=(20, 20 + 40), fontFace=cv2.FONT_HERSHEY_COMPLEX, fontScale=0.5,
                         color=(0, 0, 255))
             handle_skill(cv2_mat)
-            cv2.imshow(window_name, result.plot())
+            cv2.imshow(window_name, result.plot(line_width=1, font_size=0.1))
             key = cv2.waitKey(1)
 
             if key != -1:

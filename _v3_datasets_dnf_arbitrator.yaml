@@ -51,12 +51,12 @@ names:
   32: dungeon_common_continue_gray
   33: dungeon_common_select_dungeon
   34: dungeon_common_back_town
-  35: dungeon_common_not_not_in
-  36: ___dungeon_arbitrator____
-  37: dungeon_arbitrator_icon
-  38: dungeon_arbitrator_boss_box
-  39: dungeon_arbitrator_boss_insect
-  40: dungeon_arbitrator_boss_knight
+  35: dungeon_common_entry_enable
+  36: dungeon_common_entry_disable
+  37: ___dungeon_arbitrator____
+  38: dungeon_arbitrator_icon
+  39: dungeon_arbitrator_boss_box
+  40: dungeon_arbitrator_boss
   41: dungeon_arbitrator_monster_rock
   42: dungeon_arbitrator_monster_girl
   43: dungeon_arbitrator_star_box_ball
