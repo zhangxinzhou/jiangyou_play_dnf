@@ -156,54 +156,54 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "arbitrator",
             "dungeon_icon": "dungeon_arbitrator_icon",
             "dungeon_status": "done",
-            "dungeon_round": 1
+            "dungeon_round": 2
         }, {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
-            "dungeon_status": "done",
-            "dungeon_round": 1
+            "dungeon_status": "todo",
+            "dungeon_round": 2
         }],
     "naima01": [
         {
             "dungeon_name": "arbitrator",
             "dungeon_icon": "dungeon_arbitrator_icon",
-            "dungeon_status": "done",
+            "dungeon_status": "todo",
             "dungeon_round": 2
         }, {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
-            "dungeon_status": "done",
+            "dungeon_status": "todo",
             "dungeon_round": 2
         }],
     "nailuo": [
         {
             "dungeon_name": "arbitrator",
             "dungeon_icon": "dungeon_arbitrator_icon",
-            "dungeon_status": "done",
+            "dungeon_status": "todo",
             "dungeon_round": 2
         }, {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
-            "dungeon_status": "done",
+            "dungeon_status": "todo",
             "dungeon_round": 2
         }],
     "naima02": [
         {
             "dungeon_name": "arbitrator",
             "dungeon_icon": "dungeon_arbitrator_icon",
-            "dungeon_status": "done",
+            "dungeon_status": "todo",
             "dungeon_round": 2
         }, {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
-            "dungeon_status": "done",
+            "dungeon_status": "todo",
             "dungeon_round": 2
         }],
     "zhaohuan": [
         {
             "dungeon_name": "arbitrator",
             "dungeon_icon": "dungeon_arbitrator_icon",
-            "dungeon_status": "done",
+            "dungeon_status": "todo",
             "dungeon_round": 2
         }, {
             "dungeon_name": "library",
