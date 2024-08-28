@@ -50,13 +50,6 @@ mouse_x = 0
 mouse_y = 0
 
 
-def show_mouse_position(_event, _x, _y, _flags, _params):
-    global mouse_x
-    global mouse_y
-    mouse_x = _x
-    mouse_y = _y
-
-
 # 判断是不是灰色图
 # def calc_gray_confidence(_cv2_mat):
 #     # 虽然不知道是什么原理,但是真的好用 来源 https://stackoverflow.org.cn/questions/64038736
@@ -70,27 +63,15 @@ def show_mouse_position(_event, _x, _y, _flags, _params):
 #     return _gray_val
 
 
-def calc_yellow_confidence(_cv2_mat):
+def calc_colorful_confidence(_cv2_mat):
     _hsv = cv2.cvtColor(_cv2_mat, cv2.COLOR_BGR2HSV)
-    _lower_yellow = np.array([20, 100, 100])
-    _upper_yellow = np.array([30, 255, 255])
-    _mask_yellow = cv2.inRange(_hsv, _lower_yellow, _upper_yellow)
-    _count_yellow = cv2.countNonZero(_mask_yellow)
-    _percent_yellow = _count_yellow / _mask_yellow.size
+    _colorful_lower = np.array([0, 127, 127])
+    _colorful_upper = np.array([360, 255, 255])
+    _colorful_mask = cv2.inRange(_hsv, _colorful_lower, _colorful_upper)
+    _colorful_count = cv2.countNonZero(_colorful_mask)
+    _colorful_percent = _colorful_count / _colorful_mask.size
 
-    # _text_yellow = f'_count_yellow=[{_count_yellow}],_rate_yellow=[{_rate_yellow}]'
-    # print('*' * 100)
-    # print(_text_yellow)
-    # cv2.imshow('_res_yellow', _mask_yellow)
-
-    # _lower_gray = np.array([0, 0, 0])
-    # _upper_gray = np.array([255, 10, 255])
-    # _mask_gray = cv2.inRange(_hsv, _lower_gray, _upper_gray)
-    # _res_gray = cv2.bitwise_and(_cv2_mat, _cv2_mat, mask=_mask_gray)
-    # cv2.imshow('_mask_gray', _mask_gray)
-    # cv2.imshow('_res_gray', _res_gray)
-
-    return _percent_yellow > 0.04
+    return _colorful_percent > 0.2
 
 
 COLOR_RED = (0, 0, 255)
@@ -111,7 +92,7 @@ def handle_skill(_cv2_mat):
         _pt1, _pt2 = (_pt1_x, _pt1_y), (_pt2_x, _pt2_y)
         # 判断技能是否可用
         _skill_icon = _cv2_mat[_pt1_y:_pt2_y, _pt1_x:_pt2_x]
-        _one_y = calc_yellow_confidence(_skill_icon)
+        _one_y = calc_colorful_confidence(_skill_icon)
         _all_count += 1
         if _one_y:
             _all_count_y += 1
@@ -187,7 +168,6 @@ if __name__ == '__main__':
         show_window = True
         window_name = 'game_screen'
         cv2.namedWindow(window_name)
-        cv2.setMouseCallback(window_name, show_mouse_position)
         if show_window:
             left, top, right, bottom = get_window_rect(window_hwnd)
 
@@ -198,10 +178,6 @@ if __name__ == '__main__':
             cv2.putText(cv2_mat, text=text, org=(20, 20), fontFace=cv2.FONT_HERSHEY_COMPLEX, fontScale=0.5,
                         color=(0, 0, 255))
 
-            hsv = cv2.cvtColor(cv2_mat, cv2.COLOR_BGR2HSV)
-            position_txt = f'x=[{mouse_x:>4}] y=[{mouse_y:>4}] color=[{cv2_mat[mouse_y][mouse_x]}] hsv=[{hsv[mouse_y][mouse_x]}]'
-            cv2.putText(cv2_mat, text=position_txt, org=(20, 20 + 40), fontFace=cv2.FONT_HERSHEY_COMPLEX, fontScale=0.5,
-                        color=(0, 0, 255))
             handle_skill(cv2_mat)
             cv2.imshow(window_name, result.plot(line_width=1, font_size=0.1))
             key = cv2.waitKey(1)

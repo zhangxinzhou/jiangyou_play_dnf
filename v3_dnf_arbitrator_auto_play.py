@@ -2,7 +2,6 @@ import ctypes
 import ctypes.wintypes
 import datetime
 import json
-import os
 import sys
 import time
 
@@ -244,7 +243,7 @@ def wait_loading(wait_second_limit=10):
 def redis_get_all_role_config_key():
     # 从redis中读取配置
     _redis_key = "V3_ALL_ROLE_DUNGEON_CONFIG_"
-    _today_str = time.strftime("%Y-%m-%d", time.localtime(time.time() - 24 * 3600))
+    _today_str = time.strftime("%Y-%m-%d", time.localtime(time.time() - 8 * 3600))
     _today_redis_key = _redis_key + _today_str
     return _today_redis_key
 
@@ -448,7 +447,7 @@ def role_run():
 
 
 @print_method_name
-def turn_to_monster_or_boss():
+def face_to_monster_or_boss():
     _labels_list, _labels_dict = redis_get_labels_detail()
     _labels_list: list[str] = _labels_list
     _labels_dict: dict = _labels_dict
@@ -456,7 +455,7 @@ def turn_to_monster_or_boss():
         _role_x, _role_y = _labels_dict['town_role']['label_box_center']
 
         for _label_name in _labels_list:
-            if _label_name.__contains__('monster') and not _label_name.__contains__('hp'):
+            if _label_name.__contains__('monster'):
                 _monster_x, _monster_y = _labels_dict[_label_name]['label_box_center']
                 if _role_x - _monster_x > 0:
                     press_key(_key_list=['left'], _duration=0.1, _back_swing=0.2)
@@ -465,7 +464,7 @@ def turn_to_monster_or_boss():
                 return
 
         for _label_name in _labels_list:
-            if _label_name.__contains__('boss') and not _label_name.__contains__('hp'):
+            if _label_name.__contains__('boss'):
                 _monster_x, _monster_y = _labels_dict[_label_name]['label_box_center']
                 if _role_x - _monster_x > 0:
                     press_key(_key_list=['left'], _duration=0.1, _back_swing=0.2)
@@ -512,11 +511,11 @@ def handle_dungeon_stage_clear(_role_name):
             return
         # 打怪
         elif redis_fuzzy_search_label('monster'):
-            turn_to_monster_or_boss()
+            face_to_monster_or_boss()
             handle_monster(_role_name)
         # 打boss
         elif redis_fuzzy_search_label('boss'):
-            turn_to_monster_or_boss()
+            face_to_monster_or_boss()
             handle_boss(_role_name)
         # 移动
         elif redis_has_label('dungeon_common_arrow'):
@@ -538,7 +537,6 @@ def handle_dungeon_one_round(_role_name, _is_finish=False) -> bool:
 
 @print_method_name
 def handle_dungeon_all_round(_role_name):
-    _start_time = time.time()
     _one_role_dungeon_list = redis_get_one_role_dungeon_config(_role_name)
     for _one_role_dungeon in _one_role_dungeon_list:
         _dungeon_name = _one_role_dungeon.get("dungeon_name")
@@ -550,8 +548,8 @@ def handle_dungeon_all_round(_role_name):
             # 进入目标副本
             to_dungeon_arbitrator(_dungeon_icon)
             _MAX_ROUND = _dungeon_round
-
             for _round in range(_MAX_ROUND):
+                _start_time = time.time()
                 _is_finish = _round + 1 == _MAX_ROUND
                 _is_continue = handle_dungeon_one_round(_role_name, _is_finish)
                 _cost = time.time() - _start_time

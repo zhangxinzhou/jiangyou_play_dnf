@@ -72,10 +72,12 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["q"], "back_swing": 2},
             {"key_list": ["r"], "back_swing": 0.5},
             {"key_list": ["t"], "back_swing": 0.5},
-            {"key_list": ["up", "right", "up", "space"], "back_swing": 0.5}
+            {"key_list": ["up", "right", "up", "space"], "back_swing": 0.5},
         ],
         "handle_monster": [
-            {"key_list": ["r"], "back_swing": 1}
+            {"key_list": ["e"], "back_swing": 0.5},
+            {"key_list": ["w"], "back_swing": 0.5},
+            {"key_list": ["r"], "back_swing": 1},
         ],
         "handle_boss": [
             {"key_list": ["y"], "back_swing": 2}
@@ -125,7 +127,8 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["a"], "back_swing": 0.5},
             {"key_list": ["s"], "back_swing": 0.5},
             {"key_list": ["g"], "back_swing": 0.5},
-            {"key_list": ["h"], "back_swing": 0.5}
+            {"key_list": ["h"], "back_swing": 0.5},
+            {"key_list": ["ctrl"], "back_swing": 0.5}
         ],
         "handle_boss": [
             {"key_list": ["r"], "back_swing": 2},
@@ -155,7 +158,7 @@ ALL_ROLE_DUNGEON_DICT = {
         {
             "dungeon_name": "arbitrator",
             "dungeon_icon": "dungeon_arbitrator_icon",
-            "dungeon_status": "done",
+            "dungeon_status": "todo",
             "dungeon_round": 2
         }, {
             "dungeon_name": "library",
