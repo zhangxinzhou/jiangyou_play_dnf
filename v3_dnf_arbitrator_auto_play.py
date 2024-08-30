@@ -336,17 +336,32 @@ def to_dungeon_arbitrator(_dungeon_icon):
         time.sleep(sleep_second)
         if not redis_has_label('town_select_menu_teleportation_light'):
             press_key(_key_list=['esc'], _back_swing=0.1)
+            time.sleep(0.5)
 
     # 点击传送阵
     for i in range(try_times):
         time.sleep(sleep_second)
         if redis_mouse_left_click_if_has_label('town_select_menu_teleportation_light'):
+            time.sleep(0.5)
             break
+
+    # 因为副本图标识别不准确,当有多个或者单个的时候就按up键,来切换副本icon
+    for i in range(100):
+        _labels_detail_list: list = json.loads(REDIS_CONN.get('labels_detail_list'))
+        _dungeon_icon_count = 0
+        for _one in _labels_detail_list:
+            if _one['name'] == _dungeon_icon:
+                _dungeon_icon_count += 1
+        if _dungeon_icon_count == 1:
+            break
+        else:
+            press_key(_key_list=['up'], _back_swing=0.5)
 
     # 传送到目标副本区域
     for i in range(try_times):
         time.sleep(sleep_second)
         if redis_mouse_left_click_if_has_label(_dungeon_icon):
+            time.sleep(0.5)
             break
 
     # 进入副本,选择进入的地下城,点击进入地下城
@@ -355,6 +370,7 @@ def to_dungeon_arbitrator(_dungeon_icon):
         press_key(_key_list=['right'], _duration=2)
         if redis_mouse_left_click_if_has_label(_dungeon_icon):
             press_key(_key_list=['space'], _back_swing=0.1)
+            time.sleep(0.5)
             break
 
 
@@ -554,7 +570,7 @@ def handle_dungeon_all_round(_role_name):
                 _is_continue = handle_dungeon_one_round(_role_name, _is_finish)
                 _cost = time.time() - _start_time
                 print(
-                    f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name}] round=[{_round:>02}] cost=[{_cost:.2f}] s')
+                    f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name}] round=[{_round + 1:>02}] cost=[{_cost:.2f}] s')
                 if not _is_continue:
                     break
             # redis更新状态
@@ -624,6 +640,7 @@ def play():
     time.sleep(1)
 
     role_name_list = ["modao", "naima01", "nailuo", "naima02", "zhaohuan", "saber", "zhanfa", "papading", "naima03"]
+    # role_name_list = ["naima03"]
     # =============================play开始===============================
     for role_name in role_name_list:
         play_one_role(role_name)

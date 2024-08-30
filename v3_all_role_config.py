@@ -114,7 +114,7 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["h"], "back_swing": 0.5}
         ],
         "handle_boss": [
-            {"key_list": ["t"], "back_swing": 3}
+            {"key_list": ["e"], "back_swing": 0.5}
         ]
     },
     "papading": {
