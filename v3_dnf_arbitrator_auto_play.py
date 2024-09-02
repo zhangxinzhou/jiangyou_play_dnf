@@ -419,6 +419,7 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
         press_key(_key_list=['f12'], _back_swing=2)
         return False
     elif redis_has_label('dungeon_common_continue_gray'):
+        print(f"identify label ['dungeon_common_continue_gray']")
         press_key(_key_list=['f12'], _back_swing=2)
         return False
     elif redis_has_label('dungeon_common_continue_normal'):
@@ -570,7 +571,7 @@ def handle_dungeon_all_round(_role_name):
                 _is_continue = handle_dungeon_one_round(_role_name, _is_finish)
                 _cost = time.time() - _start_time
                 print(
-                    f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name}] round=[{_round + 1:>02}] cost=[{_cost:.2f}] s')
+                    f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name:<20}] round=[{_round + 1:>02}] cost=[{_cost:.2f}] s')
                 if not _is_continue:
                     break
             # redis更新状态
@@ -583,7 +584,7 @@ def handle_dungeon_all_round(_role_name):
 
         else:
             print(
-                f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name}] has done, skip')
+                f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name:<20}] has done, skip')
 
 
 @print_method_name
@@ -622,8 +623,9 @@ def play_one_role(_role_name):
     # 畅玩任务,领取奖励
     handle_town_play_quest()
     _cost = time.time() - _start_time
-    print(
-        f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] end, cost=[{_cost:.2f}] s')
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] end')
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] cost=[{_cost:.2f}] s')
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}]', "*" * 50)
 
 
 @print_method_name
@@ -659,7 +661,8 @@ def play():
 
     # 计算耗时
     _cost = time.time() - _start_time
-    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] program end, cost=[{_cost:.2f}] s')
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] program end')
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] cost=[{_cost:.2f}] s')
 
 
 if __name__ == '__main__':
