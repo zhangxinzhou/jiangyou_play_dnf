@@ -571,7 +571,7 @@ def handle_dungeon_all_round(_role_name):
                 _is_continue = handle_dungeon_one_round(_role_name, _is_finish)
                 _cost = time.time() - _start_time
                 print(
-                    f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name:<20}] round=[{_round + 1:>02}] cost=[{_cost:.2f}] s')
+                    f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name:<20}] round=[{_round + 1:>02}/{_MAX_ROUND:>02}] cost=[{_cost:.2f}] s')
                 if not _is_continue:
                     break
             # redis更新状态

@@ -100,7 +100,7 @@ def handle_skill(_cv2_mat):
         cv2.rectangle(_cv2_mat, _pt1, _pt2, color=_color, thickness=1)
         redis_conn.hset('skill', _skill_key, 'Y' if _one_y else 'N')
     # 整个技能框
-    _all_y = _all_count_y / _all_count > 0.5
+    _all_y = _all_count_y > 5
     _color = COLOR_GREEN if _all_y else COLOR_RED
     cv2.rectangle(_cv2_mat, (_box_x1 - 1, _box_y1 - 1), (_box_x2 + 1, _box_y2 + 1), color=_color, thickness=1)
     redis_conn.hset('skill', f'all', 'Y' if _all_y else 'N')
