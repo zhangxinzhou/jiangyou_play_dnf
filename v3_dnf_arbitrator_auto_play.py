@@ -154,7 +154,6 @@ def redis_get_labels_detail() -> (list, dict):
         if PROGRAM_EXIT:
             print("program exit.")
             sys.exit(-1)
-        print("program pause...")
         time.sleep(1)
 
     _labels_dict: dict = json.loads(REDIS_CONN.get('labels_detail_dict'))
@@ -165,11 +164,15 @@ def redis_get_labels_detail() -> (list, dict):
 
 
 def redis_has_label(_label) -> bool:
-    _labels_list, _labels_dict = redis_get_labels_detail()
-    _labels_list: list = _labels_list
-    _labels_dict: dict = _labels_dict
-    _has_label = _labels_list.__contains__(_label)
-    return _has_label
+    _retry_times = 3
+    for i in range(_retry_times):
+        _labels_list, _labels_dict = redis_get_labels_detail()
+        _labels_list: list = _labels_list
+        _labels_dict: dict = _labels_dict
+        _has_label = _labels_list.__contains__(_label)
+        if _has_label:
+            return True
+    return False
 
 
 def redis_fuzzy_search_label(_label) -> bool:
@@ -468,26 +471,31 @@ def face_to_monster_or_boss():
     _labels_list, _labels_dict = redis_get_labels_detail()
     _labels_list: list[str] = _labels_list
     _labels_dict: dict = _labels_dict
+    # 如果找不到角色,就假设角色在中间
+    _window_left, _window_top, _window_right, _window_bottom = get_relative_window_rect(WINDOW_HWND)
+    _window_width = _window_right - _window_left
+    _window_height = _window_bottom - _window_top
+    _role_x, _role_y = _window_width * 0.5, _window_height * 0.5
     if _labels_list.__contains__('town_role'):
         _role_x, _role_y = _labels_dict['town_role']['label_box_center']
 
-        for _label_name in _labels_list:
-            if _label_name.__contains__('monster'):
-                _monster_x, _monster_y = _labels_dict[_label_name]['label_box_center']
-                if _role_x - _monster_x > 0:
-                    press_key(_key_list=['left'], _duration=0.1, _back_swing=0.2)
-                else:
-                    press_key(_key_list=['right'], _duration=0.1, _back_swing=0.2)
-                return
+    for _label_name in _labels_list:
+        if _label_name.__contains__('monster'):
+            _monster_x, _monster_y = _labels_dict[_label_name]['label_box_center']
+            if _role_x - _monster_x > 0:
+                press_key(_key_list=['left'], _duration=0.1, _back_swing=0.2)
+            else:
+                press_key(_key_list=['right'], _duration=0.1, _back_swing=0.2)
+            return
 
-        for _label_name in _labels_list:
-            if _label_name.__contains__('boss'):
-                _monster_x, _monster_y = _labels_dict[_label_name]['label_box_center']
-                if _role_x - _monster_x > 0:
-                    press_key(_key_list=['left'], _duration=0.1, _back_swing=0.2)
-                else:
-                    press_key(_key_list=['right'], _duration=0.1, _back_swing=0.2)
-                return
+    for _label_name in _labels_list:
+        if _label_name.__contains__('boss'):
+            _monster_x, _monster_y = _labels_dict[_label_name]['label_box_center']
+            if _role_x - _monster_x > 0:
+                press_key(_key_list=['left'], _duration=0.1, _back_swing=0.2)
+            else:
+                press_key(_key_list=['right'], _duration=0.1, _back_swing=0.2)
+            return
 
 
 @print_method_name

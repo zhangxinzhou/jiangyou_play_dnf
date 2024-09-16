@@ -176,7 +176,7 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 3
+            "dungeon_round": 5
         }],
     "nailuo": [
         {
@@ -236,31 +236,31 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 3
+            "dungeon_round": 5
         }],
     "papading": [
         {
             "dungeon_name": "arbitrator",
             "dungeon_icon": "dungeon_arbitrator_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 4
+            "dungeon_round": 2
         }, {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 0
+            "dungeon_round": 2
         }],
     "naima03": [
         {
             "dungeon_name": "arbitrator",
             "dungeon_icon": "dungeon_arbitrator_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 4
+            "dungeon_round": 2
         }, {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 0
+            "dungeon_round": 2
         }],
 }
 
