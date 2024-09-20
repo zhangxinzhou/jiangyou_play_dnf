@@ -172,6 +172,7 @@ def redis_has_label(_label) -> bool:
         _has_label = _labels_list.__contains__(_label)
         if _has_label:
             return True
+        time.sleep(0.1)
     return False
 
 
