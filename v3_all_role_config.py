@@ -176,7 +176,7 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 5
+            "dungeon_round": 10
         }],
     "nailuo": [
         {
@@ -236,7 +236,7 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 5
+            "dungeon_round": 10
         }],
     "papading": [
         {

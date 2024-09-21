@@ -403,7 +403,7 @@ def handle_dungeon_stage_start(_role_name):
 @print_method_name
 def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
     # wait_label_exists(['dungeon_common_shop_box'])
-    if redis_has_label('dungeon_common_shop_box'):
+    if redis_has_label('dungeon_common_shop_box') or redis_has_label('dungeon_common_continue_box'):
         # 维修武器
         press_key(_key_list=['s', 'space'], _back_swing=0.1)
         time.sleep(3)
@@ -531,9 +531,15 @@ def handle_boss(_role_name):
 
 @print_method_name
 def handle_dungeon_stage_clear(_role_name):
+    _start_time = time.time()
     while True:
+        _cost = time.time() - _start_time
+        # 刷图超过60秒放一次大招
+        if _cost > 60:
+            handle_boss(_role_name)
+            _start_time = time.time()
         # 退出
-        if redis_has_label('dungeon_common_shop_box'):
+        if redis_has_label('dungeon_common_shop_box') or redis_has_label('dungeon_common_continue_box'):
             return
         # 打怪
         elif redis_fuzzy_search_label('monster'):
