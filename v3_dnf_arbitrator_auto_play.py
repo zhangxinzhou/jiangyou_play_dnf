@@ -288,19 +288,21 @@ def print_method_name(func):
 # 畅玩任务
 @print_method_name
 def handle_town_play_quest():
+    # 等待loading
     wait_all_skill_enable()
 
     # 打开畅玩任务(畅玩任务图标的感叹号识别的不准确)
     if not redis_has_label('town_play_quest_ui_header'):
         redis_mouse_left_click_if_has_label('town_play_quest_icon_light')
 
-    # 领取奖励
-    for i in range(10):
-        if not redis_mouse_left_click_if_has_label('town_play_quest_claim_light'):
-            break
-
-    # 关闭畅玩任务
-    press_key(_key_list=['esc'], _back_swing=0.5)
+    # 领取任务
+    if redis_has_label('town_play_quest_ui_header'):
+        # 领取奖励
+        for i in range(10):
+            if not redis_mouse_left_click_if_has_label('town_play_quest_claim_light'):
+                break
+        # 关闭畅玩任务
+        press_key(_key_list=['esc'], _back_swing=0.5)
 
 
 @print_method_name
@@ -648,7 +650,6 @@ def play():
     time.sleep(1)
 
     role_name_list = ["modao", "naima01", "nailuo", "naima02", "zhaohuan", "saber", "zhanfa", "papading", "naima03"]
-    role_name_list = ["nailuo", "naima02"]
     # role_name_list = ["naima03"]
     # =============================play开始===============================
     for role_name in role_name_list:
