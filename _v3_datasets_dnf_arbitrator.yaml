@@ -44,22 +44,20 @@ names:
   28: dungeon_common_continue_box
   29: dungeon_common_continue_normal
   30: dungeon_common_continue_gray
-  31: dungeon_common_select_dungeon
-  32: dungeon_common_back_town
-  33: dungeon_common_entry_enable
-  34: dungeon_common_entry_disable
-  35: dungeon_common_pl_enable
-  36: dungeon_common_pl_disable
-  37: ___dungeon_arbitrator____
-  38: dungeon_arbitrator_icon
-  39: dungeon_arbitrator_boss_box
-  40: dungeon_arbitrator_boss
-  41: dungeon_arbitrator_monster_rock
-  42: dungeon_arbitrator_monster_girl
-  43: dungeon_arbitrator_star_box_ball
-  44: dungeon_arbitrator_star_box_cube
-  45: ___dungeon_library____
-  46: dungeon_library_icon
-  47: dungeon_library_monster_boy
-  48: dungeon_library_monster_girl
-  49: dungeon_library_boss_box
+  31: dungeon_common_entry_enable
+  32: dungeon_common_entry_disable
+  33: dungeon_common_pl_enable
+  34: dungeon_common_pl_disable
+  35: ___dungeon_arbitrator____
+  36: dungeon_arbitrator_icon
+  37: dungeon_arbitrator_boss_box
+  38: dungeon_arbitrator_boss
+  39: dungeon_arbitrator_monster_rock
+  40: dungeon_arbitrator_monster_girl
+  41: dungeon_arbitrator_star_box_ball
+  42: dungeon_arbitrator_star_box_cube
+  43: ___dungeon_library____
+  44: dungeon_library_icon
+  45: dungeon_library_monster_boy
+  46: dungeon_library_monster_girl
+  47: dungeon_library_boss_box

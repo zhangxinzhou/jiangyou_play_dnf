@@ -238,12 +238,6 @@ def wait_all_skill_enable(_wait_second_limit=3):
             return
 
 
-def wait_loading(wait_second_limit=10):
-    # 等待界面加载loading
-    _label_list = ['town_play_quest_icon_gray', 'town_play_quest_icon_light']
-    wait_label_exists(_label_list, wait_second_limit)
-
-
 def redis_get_all_role_config_key():
     # 从redis中读取配置
     _redis_key = "V3_ALL_ROLE_DUNGEON_CONFIG_"
@@ -298,8 +292,6 @@ def handle_town_play_quest():
 
     # 打开畅玩任务(畅玩任务图标的感叹号识别的不准确)
     if not redis_has_label('town_play_quest_ui_header'):
-        redis_mouse_left_click_if_has_label('town_play_quest_icon_gray')
-    if not redis_has_label('town_play_quest_ui_header'):
         redis_mouse_left_click_if_has_label('town_play_quest_icon_light')
 
     # 领取奖励
@@ -307,12 +299,8 @@ def handle_town_play_quest():
         if not redis_mouse_left_click_if_has_label('town_play_quest_claim_light'):
             break
 
-    # 关闭畅玩任务(如果识别不出来关闭按钮,再点一下畅玩任务图标)
-    if not redis_mouse_left_click_if_has_label('town_play_quest_ui_close_button'):
-        if redis_has_label('town_play_quest_ui_header'):
-            redis_mouse_left_click_if_has_label('town_play_quest_icon_gray')
-        if redis_has_label('town_play_quest_ui_header'):
-            redis_mouse_left_click_if_has_label('town_play_quest_icon_light')
+    # 关闭畅玩任务
+    press_key(_key_list=['esc'], _back_swing=0.5)
 
 
 @print_method_name
@@ -368,14 +356,17 @@ def to_dungeon_arbitrator(_dungeon_icon):
             time.sleep(0.5)
             break
 
-    # 进入副本,选择进入的地下城,点击进入地下城
+    # 进入副本选择界面
     for i in range(try_times):
         time.sleep(sleep_second)
         press_key(_key_list=['right'], _duration=2)
-        if redis_mouse_left_click_if_has_label(_dungeon_icon):
-            press_key(_key_list=['space'], _back_swing=0.1)
-            time.sleep(0.5)
+        if redis_has_label(_dungeon_icon):
             break
+
+    # 点击副本icon
+    for i in range(try_times):
+        redis_mouse_left_click_if_has_label(_dungeon_icon)
+        time.sleep(0.1)
 
 
 @print_method_name
@@ -657,6 +648,7 @@ def play():
     time.sleep(1)
 
     role_name_list = ["modao", "naima01", "nailuo", "naima02", "zhaohuan", "saber", "zhanfa", "papading", "naima03"]
+    role_name_list = ["nailuo", "naima02"]
     # role_name_list = ["naima03"]
     # =============================play开始===============================
     for role_name in role_name_list:
