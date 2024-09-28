@@ -107,6 +107,11 @@ def handle_skill(_cv2_mat):
 
 
 if __name__ == '__main__':
+    # 监测是否已经启动的检测,如果已经启动就不要重复启动
+    _detection_working = redis_conn.exists('v3_detection_working')
+    if _detection_working==1:
+        print(f"detection job has been started, this one will exit")
+        exit(-1)
     window_title = r'地下城与勇士：创新世纪'
     window_hwnd = win32gui.FindWindow(None, window_title)
     if window_title is None or window_hwnd == 0:
@@ -161,6 +166,7 @@ if __name__ == '__main__':
                 x, y = v['label_box_center']
                 cv2.line(cv2_mat, pt1=(x, y - 100), pt2=(x, y + 100), color=(0, 0, 255), thickness=3)
                 cv2.line(cv2_mat, pt1=(x - 100, y), pt2=(x + 100, y), color=(0, 0, 255), thickness=3)
+        redis_conn.set(name='v3_detection_working', value='1', ex=1)
         redis_conn.set(name='labels_detail_list', value=json.dumps(labels_detail_list))
         redis_conn.set(name='labels_detail_dict', value=json.dumps(labels_detail_dict))
 

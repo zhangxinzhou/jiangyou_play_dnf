@@ -269,6 +269,25 @@ def redis_set_one_role_config(_one_role_config: dict) -> None:
     REDIS_CONN.hset(_today_redis_key, json.dumps(_one_role_config))
 
 
+def print_red_color(text: str):
+    print('\033[1;31;40m' + text + '\033[0m')
+
+
+def wait_detection_working():
+    _start_time = time.time()
+    while True:
+        _cost = time.time() - _start_time
+        _detection_working = REDIS_CONN.exists('v3_detection_working')
+        if _cost > 120:
+            print_red_color(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] waiting [{_cost}]s, exit')
+            sys.exit(-1)
+        if _detection_working == 1:
+            print_red_color(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] detection is working')
+            break
+        # 等待
+        time.sleep(1)
+
+
 def print_method_name(func):
     def wrapper(*args, **kwargs):
         _f_name = func.__name__
@@ -370,6 +389,23 @@ def to_dungeon_arbitrator(_dungeon_icon):
         redis_mouse_left_click_if_has_label(_dungeon_icon)
         time.sleep(0.1)
 
+    # 不满足进入条件,如:门票,战斗力
+    if redis_has_label('dungeon_common_entry_disable'):
+        # 不满足进入条件,退出到城镇
+        press_key(_key_list=['f12'], _duration=0.5)
+        print_red_color(
+            f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] identify label=[dungeon_common_entry_disable]')
+        return False
+    # 疲劳不满足,无法进入副本
+    if redis_has_label('dungeon_common_pl_disable'):
+        # 不满足进入条件,退出到城镇
+        press_key(_key_list=['f12'], _duration=0.5)
+        print_red_color(
+            f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] identify label=[dungeon_common_pl_disable]')
+        return False
+    # 成功,进入副本
+    return True
+
 
 @print_method_name
 def handle_key_list(_key_list: list):
@@ -416,7 +452,8 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
         press_key(_key_list=['f12'], _back_swing=2)
         return False
     elif redis_has_label('dungeon_common_continue_gray'):
-        print(f"identify label ['dungeon_common_continue_gray']")
+        print_red_color(
+            f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] identify label=[dungeon_common_continue_gray]')
         press_key(_key_list=['f12'], _back_swing=2)
         return False
     elif redis_has_label('dungeon_common_continue_normal'):
@@ -474,21 +511,12 @@ def face_to_monster_or_boss():
         _role_x, _role_y = _labels_dict['town_role']['label_box_center']
 
     for _label_name in _labels_list:
-        if _label_name.__contains__('monster'):
+        if _label_name.__contains__('monster') or _label_name.__contains__('boss'):
             _monster_x, _monster_y = _labels_dict[_label_name]['label_box_center']
-            if _role_x - _monster_x > 0:
-                press_key(_key_list=['left'], _duration=0.1, _back_swing=0.2)
-            else:
-                press_key(_key_list=['right'], _duration=0.1, _back_swing=0.2)
-            return
-
-    for _label_name in _labels_list:
-        if _label_name.__contains__('boss'):
-            _monster_x, _monster_y = _labels_dict[_label_name]['label_box_center']
-            if _role_x - _monster_x > 0:
-                press_key(_key_list=['left'], _duration=0.1, _back_swing=0.2)
-            else:
-                press_key(_key_list=['right'], _duration=0.1, _back_swing=0.2)
+            _distance = _role_x - _monster_x
+            _key_list = ['left'] if _distance > 0 else ['right']
+            _duration = 0.3 if abs(_distance) > 200 else 0.0
+            press_key(_key_list=_key_list, _duration=_duration, _back_swing=0.2)
             return
 
 
@@ -571,7 +599,12 @@ def handle_dungeon_all_round(_role_name):
 
         if _dungeon_status == 'todo' and _dungeon_round > 0:
             # 进入目标副本
-            to_dungeon_arbitrator(_dungeon_icon)
+            _entry_able = to_dungeon_arbitrator(_dungeon_icon)
+            if not _entry_able:
+                print(
+                    f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name:<20}] can not enter')
+                # 到下一个for循环
+                continue
             _MAX_ROUND = _dungeon_round
             for _round in range(_MAX_ROUND):
                 _start_time = time.time()
@@ -581,7 +614,8 @@ def handle_dungeon_all_round(_role_name):
                 print(
                     f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name:<20}] round=[{_round + 1:>02}/{_MAX_ROUND:>02}] cost=[{_cost:.2f}] s')
                 if not _is_continue:
-                    break
+                    # 到下一个for循环
+                    continue
             # redis更新状态
             _one_role_dungeon['dungeon_status'] = 'done'
             _today_redis_key = redis_get_all_role_config_key()
@@ -593,14 +627,6 @@ def handle_dungeon_all_round(_role_name):
         else:
             print(
                 f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name:<20}] has done, skip')
-
-
-@print_method_name
-def to_target_dungeon(_dungeon_icon):
-    if _dungeon_icon is not None:
-        to_dungeon_arbitrator(_dungeon_icon=_dungeon_icon)
-    else:
-        print(f'_dungeon_icon can not be None, skip')
 
 
 @print_method_name
@@ -643,6 +669,9 @@ def play():
     _start_time = time.time()
     time.sleep(1)
 
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] waiting detection working')
+    wait_detection_working()
+
     # 被其他窗口遮挡，调用后放到最前面
     win32gui.SetForegroundWindow(WINDOW_HWND)
     # 解决被最小化的情况
@@ -650,7 +679,7 @@ def play():
     time.sleep(1)
 
     role_name_list = ["modao", "naima01", "nailuo", "naima02", "zhaohuan", "saber", "zhanfa", "papading", "naima03"]
-    # role_name_list = ["naima03"]
+    role_name_list = ["nailuo"]
     # =============================play开始===============================
     for role_name in role_name_list:
         play_one_role(role_name)
