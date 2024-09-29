@@ -32,6 +32,11 @@ PROGRAM_PAUSE = False
 # 调试,打印执行到那个方法,方便观察卡在那个方法里面
 DEBUG_MODE = False
 
+# 重试次数
+RETRY_TIMES = 5
+# 休眠时间
+SLEEP_SECOND = 0.1
+
 
 #######################################################
 # utils START
@@ -95,27 +100,27 @@ def press_key(_key_list: list, _duration=0.0, _back_swing=0.3) -> None:
 
 def mouse_left_click() -> None:
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 100, 100)
-    time.sleep(0.1)
+    time.sleep(SLEEP_SECOND)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 100, 100)
-    time.sleep(0.1)
+    time.sleep(SLEEP_SECOND)
 
 
 def mouse_left_double_click() -> None:
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 100, 100)
-    time.sleep(0.1)
+    time.sleep(SLEEP_SECOND)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 100, 100)
-    time.sleep(0.1)
+    time.sleep(SLEEP_SECOND)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 100, 100)
-    time.sleep(0.1)
+    time.sleep(SLEEP_SECOND)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 100, 100)
-    time.sleep(0.1)
+    time.sleep(SLEEP_SECOND)
 
 
 def mouse_right_click() -> None:
     win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, 100, 100)
-    time.sleep(0.1)
+    time.sleep(SLEEP_SECOND)
     win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, 100, 100)
-    time.sleep(0.1)
+    time.sleep(SLEEP_SECOND)
 
 
 def get_window_hand() -> None:
@@ -154,7 +159,7 @@ def redis_get_labels_detail() -> (list, dict):
         if PROGRAM_EXIT:
             print("program exit.")
             sys.exit(-1)
-        time.sleep(1)
+        time.sleep(SLEEP_SECOND)
 
     _labels_dict: dict = json.loads(REDIS_CONN.get('labels_detail_dict'))
     if _labels_dict is None:
@@ -164,15 +169,14 @@ def redis_get_labels_detail() -> (list, dict):
 
 
 def redis_has_label(_label) -> bool:
-    _retry_times = 3
-    for i in range(_retry_times):
+    for i in range(RETRY_TIMES):
         _labels_list, _labels_dict = redis_get_labels_detail()
         _labels_list: list = _labels_list
         _labels_dict: dict = _labels_dict
         _has_label = _labels_list.__contains__(_label)
         if _has_label:
             return True
-        time.sleep(0.1)
+        time.sleep(SLEEP_SECOND)
     return False
 
 
@@ -196,7 +200,7 @@ def redis_mouse_left_click_if_has_label(_label) -> bool:
         _window_x, _window_y = get_absolute_window_rect(WINDOW_HWND, _game_x, _game_y)
         pydirectinput.moveTo(_window_x, _window_y)
         mouse_left_click()
-        time.sleep(0.3)
+        time.sleep(SLEEP_SECOND)
     return _has_label
 
 
@@ -210,26 +214,11 @@ def redis_get_skill_able(skill_key) -> bool:
     return _skill_ok
 
 
-def wait_label_exists(_label_list: list, _wait_second_limit=10):
-    # 等待界面加载loading
-    _start_time = time.time()
-    while True:
-        time.sleep(0.5)
-        _cost = time.time() - _start_time
-        if _cost > _wait_second_limit:
-            print(f'wait label [{_label_list}] [{_cost:.2f}] s, skip')
-            return
-        for _label in _label_list:
-            if redis_has_label(_label):
-                # print('loading complete')
-                return
-
-
 def wait_all_skill_enable(_wait_second_limit=3):
     # 等待界面加载loading
     _start_time = time.time()
     while True:
-        time.sleep(0.5)
+        time.sleep(SLEEP_SECOND)
         _cost = time.time() - _start_time
         if _cost > _wait_second_limit:
             print(f'wait wait_all_skill_enable [{_cost:.2f}] s, skip')
@@ -285,7 +274,7 @@ def wait_detection_working():
             print_red_color(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] detection is working')
             break
         # 等待
-        time.sleep(1)
+        time.sleep(SLEEP_SECOND)
 
 
 def print_method_name(func):
@@ -326,36 +315,46 @@ def handle_town_play_quest():
 
 @print_method_name
 def to_select_role_ui():
+    # 存在游戏开始菜单,结束
     if redis_has_label('town_game_start_button'):
         return
 
-    for i in range(3):
+    # 按esc出现选择菜单
+    for i in range(RETRY_TIMES):
         if not redis_has_label('town_select_menu_select_role_light'):
             press_key(_key_list=['esc'], _back_swing=0.1)
-            time.sleep(0.5)
+            time.sleep(SLEEP_SECOND)
 
-    if not redis_mouse_left_click_if_has_label('town_select_menu_select_role_light'):
-        print('can not find labels [town_select_menu_select_role_light]')
-        sys.exit(-1)
+    # 左键单击选择角色按钮
+    for i in range(RETRY_TIMES):
+        if redis_mouse_left_click_if_has_label('town_select_menu_select_role_light'):
+            time.sleep(SLEEP_SECOND)
+            break
+
+    # 存在游戏开始菜单,结束
+    for i in range(RETRY_TIMES):
+        if redis_has_label('town_game_start_button'):
+            return
+
+    print('can not find labels [town_game_start_button]')
+    sys.exit(-1)
 
 
 # 进入副本
 @print_method_name
 def to_dungeon_arbitrator(_dungeon_icon):
-    try_times = 3
-    sleep_second = 0.3
     # esc打开菜单
-    for i in range(try_times):
-        time.sleep(sleep_second)
+    for i in range(RETRY_TIMES):
+        time.sleep(SLEEP_SECOND)
         if not redis_has_label('town_select_menu_teleportation_light'):
             press_key(_key_list=['esc'], _back_swing=0.1)
-            time.sleep(0.5)
+            time.sleep(SLEEP_SECOND)
 
     # 点击传送阵
-    for i in range(try_times):
-        time.sleep(sleep_second)
+    for i in range(RETRY_TIMES):
+        time.sleep(SLEEP_SECOND)
         if redis_mouse_left_click_if_has_label('town_select_menu_teleportation_light'):
-            time.sleep(0.5)
+            time.sleep(SLEEP_SECOND)
             break
 
     # 因为副本图标识别不准确,当有多个或者单个的时候就按up键,来切换副本icon
@@ -371,23 +370,23 @@ def to_dungeon_arbitrator(_dungeon_icon):
             press_key(_key_list=['up'], _back_swing=0.5)
 
     # 传送到目标副本区域
-    for i in range(try_times):
-        time.sleep(sleep_second)
+    for i in range(RETRY_TIMES):
+        time.sleep(SLEEP_SECOND)
         if redis_mouse_left_click_if_has_label(_dungeon_icon):
-            time.sleep(0.5)
+            time.sleep(SLEEP_SECOND)
             break
 
     # 进入副本选择界面
-    for i in range(try_times):
-        time.sleep(sleep_second)
+    for i in range(RETRY_TIMES):
+        time.sleep(SLEEP_SECOND)
         press_key(_key_list=['right'], _duration=2)
         if redis_has_label(_dungeon_icon):
             break
 
     # 点击副本icon
-    for i in range(try_times):
+    for i in range(RETRY_TIMES):
         redis_mouse_left_click_if_has_label(_dungeon_icon)
-        time.sleep(0.1)
+        time.sleep(SLEEP_SECOND)
 
     # 不满足进入条件,如:门票,战斗力
     if redis_has_label('dungeon_common_entry_disable'):
@@ -421,7 +420,7 @@ def handle_key_list(_key_list: list):
 def handle_dungeon_stage_start(_role_name):
     _handle_buff = v3_all_role_config.ALL_ROLE_SKILL_DICT.get(_role_name).get('handle_buff')
     wait_all_skill_enable()
-    time.sleep(0.5)
+    time.sleep(SLEEP_SECOND)
     handle_key_list(_handle_buff)
 
 
@@ -475,18 +474,17 @@ def role_run():
 
     # 判断是否可以跑
     _start_time = time.time()
-    _sleep_time = 0.2
     while True:
-        time.sleep(_sleep_time)
+        time.sleep(SLEEP_SECOND)
         if time.time() - _start_time > 5:
             break
         if redis_get_skill_able('all'):
             break
 
     pydirectinput.press('right')
-    time.sleep(_sleep_time)
+    time.sleep(SLEEP_SECOND)
     pydirectinput.keyDown('right')
-    time.sleep(_sleep_time)
+    time.sleep(SLEEP_SECOND)
     while True:
         if redis_fuzzy_search_label('monster') or redis_fuzzy_search_label(
                 'boss') or redis_fuzzy_search_label(
@@ -494,7 +492,7 @@ def role_run():
             'dungeon_common_shop_box' or redis_has_label('dungeon_common_continue_box')):
             pydirectinput.keyUp('right')
             return
-        time.sleep(_sleep_time)
+        time.sleep(SLEEP_SECOND)
 
 
 @print_method_name
@@ -529,7 +527,7 @@ def handle_monster(_role_name):
             press_key(_key_list=_skill_one.get('key_list'),
                       _duration=_skill_one.get('duration'),
                       _back_swing=_skill_one.get('back_swing'))
-            time.sleep(0.5)
+            time.sleep(SLEEP_SECOND)
             return
 
 
@@ -543,7 +541,7 @@ def handle_boss(_role_name):
             press_key(_key_list=_skill_one.get('key_list'),
                       _duration=_skill_one.get('duration'),
                       _back_swing=_skill_one.get('back_swing'))
-            time.sleep(0.5)
+            time.sleep(SLEEP_SECOND)
             _count += 1
 
     if _count == 0:
@@ -629,18 +627,37 @@ def handle_dungeon_all_round(_role_name):
                 f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name:<20}] has done, skip')
 
 
+# 等待交易保护结束,关闭活动提醒页面
+def wait_transaction_protect_end():
+    # 等待交易保护icon消失
+    _start_time = time.time()
+    while True:
+        _cost = time.time() - _start_time
+        _has_transaction_protection_icon = redis_has_label('town_transaction_protection_icon')
+        if _cost > 60:
+            print_red_color(
+                f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] wait 60s, go on')
+            return
+        if _has_transaction_protection_icon:
+            print_red_color(
+                f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] detection town_transaction_protection_icon, wait 5s')
+        else:
+            print_red_color(
+                f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] do not detection town_transaction_protection_icon, go on')
+            return
+        time.sleep(5)
+
+
 @print_method_name
-def play_one_role(_role_name):
+def play_one_role(_role_index, _role_name):
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] start')
     # 开始时间
     _start_time = time.time()
     # 获取角色配置
     _one_role_skill_config = v3_all_role_config.ALL_ROLE_SKILL_DICT.get(_role_name)
     _role_xy = _one_role_skill_config.get('role_xy')
-
     # 进入选择角色ui
     to_select_role_ui()
-    wait_label_exists(['town_game_start_button'])
     # 选择角色
     _window_left, _window_top, _window_right, _window_bottom = get_relative_window_rect(WINDOW_HWND)
     _window_width = _window_right - _window_left
@@ -650,6 +667,13 @@ def play_one_role(_role_name):
     _role_y = int(_window_top + _window_height * _game_y_percent)
     pydirectinput.moveTo(_role_x, _role_y)
     mouse_left_double_click()
+    # 检测到活动的关闭按钮,就点击关闭按钮
+    wait_all_skill_enable()
+    for i in range(3):
+        redis_mouse_left_click_if_has_label('town_common_close_button')
+    # 等待交易保护结束
+    if _role_index == 0:
+        wait_transaction_protect_end()
     # 畅玩任务,领取奖励
     handle_town_play_quest()
     # 刷图
@@ -667,7 +691,7 @@ def play():
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] program start')
     # 开始时间
     _start_time = time.time()
-    time.sleep(1)
+    time.sleep(SLEEP_SECOND)
 
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] waiting detection working')
     wait_detection_working()
@@ -676,13 +700,13 @@ def play():
     win32gui.SetForegroundWindow(WINDOW_HWND)
     # 解决被最小化的情况
     win32gui.ShowWindow(WINDOW_HWND, win32con.SW_RESTORE)
-    time.sleep(1)
+    time.sleep(SLEEP_SECOND)
 
     role_name_list = ["modao", "naima01", "nailuo", "naima02", "zhaohuan", "saber", "zhanfa", "papading", "naima03"]
-    role_name_list = ["nailuo"]
+    # role_name_list = ["nailuo"]
     # =============================play开始===============================
-    for role_name in role_name_list:
-        play_one_role(role_name)
+    for role_index, role_name in enumerate(role_name_list):
+        play_one_role(role_index, role_name)
     # =============================play开始===============================
 
     # =============================测试开始===============================

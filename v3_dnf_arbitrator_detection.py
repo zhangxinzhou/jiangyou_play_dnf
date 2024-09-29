@@ -109,7 +109,7 @@ def handle_skill(_cv2_mat):
 if __name__ == '__main__':
     # 监测是否已经启动的检测,如果已经启动就不要重复启动
     _detection_working = redis_conn.exists('v3_detection_working')
-    if _detection_working==1:
+    if _detection_working == 1:
         print(f"detection job has been started, this one will exit")
         exit(-1)
     window_title = r'地下城与勇士：创新世纪'
