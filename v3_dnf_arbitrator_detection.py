@@ -112,6 +112,10 @@ if __name__ == '__main__':
     if _detection_working == 1:
         print(f"detection job has been started, this one will exit")
         exit(-1)
+    # 防止多开,浪费性能
+    redis_conn.set(name='v3_detection_working', value='1', ex=300)
+
+    # 获取游戏句柄
     window_title = r'地下城与勇士：创新世纪'
     window_hwnd = win32gui.FindWindow(None, window_title)
     if window_title is None or window_hwnd == 0:

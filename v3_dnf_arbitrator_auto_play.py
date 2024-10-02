@@ -30,12 +30,13 @@ PROGRAM_EXIT = False
 PROGRAM_PAUSE = False
 
 # 调试,打印执行到那个方法,方便观察卡在那个方法里面
-DEBUG_MODE = False
+PRINT_METHOD = False
+PRINT_KEY_PRESS = False
 
 # 重试次数
-RETRY_TIMES = 5
+RETRY_TIMES = 10
 # 休眠时间
-SLEEP_SECOND = 0.1
+SLEEP_SECOND = 0.2
 
 
 #######################################################
@@ -66,14 +67,14 @@ REDIS_POOL = redis.ConnectionPool(host='127.0.0.1', port=6379)
 REDIS_CONN = redis.Redis(connection_pool=REDIS_POOL, decode_responses=True)
 
 
-def press_key(_key_list: list, _duration=0.0, _back_swing=0.3) -> None:
+def press_key(_key_list: list, _duration=0.0, _back_swing=0.2) -> None:
     """
     :param _key_list: 按键
     :param _duration: 按键持续时间,单位秒
     :param _back_swing: 技能后摇时间,单位秒
     :return:
     """
-    if DEBUG_MODE:
+    if PRINT_KEY_PRESS:
         print(f"_key_list={str(_key_list):<30},_duration={str(_duration):<5},_back_swing={str(_back_swing):<5}")
     key_list_len = len(_key_list)
     if key_list_len <= 0:
@@ -132,10 +133,6 @@ def get_window_hand() -> None:
     return _window_hwnd
 
 
-# 窗口/游戏句柄
-WINDOW_HWND = get_window_hand()
-
-
 def get_relative_window_rect(_hwnd):
     _function = ctypes.windll.dwmapi.DwmGetWindowAttribute
     rect = ctypes.wintypes.RECT()
@@ -146,6 +143,14 @@ def get_relative_window_rect(_hwnd):
 def get_absolute_window_rect(_hwnd, _game_x, _game_y):
     _window_left, _window_top, _window_right, _window_bottom = get_relative_window_rect(_hwnd)
     return _window_left + _game_x, _window_top + _game_y
+
+
+# 窗口/游戏句柄
+WINDOW_HWND = get_window_hand()
+# 游戏高度,宽度,坐标等
+WINDOW_LEFT, WINDOW_TOP, WINDOW_RIGHT, WINDOW_BOTTOM = get_relative_window_rect(WINDOW_HWND)
+WINDOW_WIDTH = WINDOW_RIGHT - WINDOW_LEFT
+WINDOW_HEIGHT = WINDOW_BOTTOM - WINDOW_TOP
 
 
 def redis_get_labels_detail() -> (list, dict):
@@ -169,7 +174,7 @@ def redis_get_labels_detail() -> (list, dict):
 
 
 def redis_has_label(_label) -> bool:
-    for i in range(RETRY_TIMES):
+    for i in range(3):
         _labels_list, _labels_dict = redis_get_labels_detail()
         _labels_list: list = _labels_list
         _labels_dict: dict = _labels_dict
@@ -279,10 +284,12 @@ def wait_detection_working():
 
 def print_method_name(func):
     def wrapper(*args, **kwargs):
+        _start_time = time.time()
         _f_name = func.__name__
-        if DEBUG_MODE:
-            print(f'execute function [{_f_name:<30}]')
         _result = func(*args, **kwargs)
+        _cost = time.time() - _start_time
+        if PRINT_METHOD:
+            print(f'execute function [{_f_name:<30}] cost=[{_cost:.2f}] s')
         return _result
 
     return wrapper
@@ -384,7 +391,7 @@ def to_dungeon_arbitrator(_dungeon_icon):
             break
 
     # 点击副本icon
-    for i in range(RETRY_TIMES):
+    for i in range(3):
         redis_mouse_left_click_if_has_label(_dungeon_icon)
         time.sleep(SLEEP_SECOND)
 
@@ -501,10 +508,7 @@ def face_to_monster_or_boss():
     _labels_list: list[str] = _labels_list
     _labels_dict: dict = _labels_dict
     # 如果找不到角色,就假设角色在中间
-    _window_left, _window_top, _window_right, _window_bottom = get_relative_window_rect(WINDOW_HWND)
-    _window_width = _window_right - _window_left
-    _window_height = _window_bottom - _window_top
-    _role_x, _role_y = _window_width * 0.5, _window_height * 0.5
+    _role_x, _role_y = WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5
     if _labels_list.__contains__('town_role'):
         _role_x, _role_y = _labels_dict['town_role']['label_box_center']
 
@@ -513,7 +517,7 @@ def face_to_monster_or_boss():
             _monster_x, _monster_y = _labels_dict[_label_name]['label_box_center']
             _distance = _role_x - _monster_x
             _key_list = ['left'] if _distance > 0 else ['right']
-            _duration = 0.3 if abs(_distance) > 200 else 0.0
+            _duration = 0.2 if abs(_distance) > 200 else 0.0
             press_key(_key_list=_key_list, _duration=_duration, _back_swing=0.2)
             return
 
@@ -527,7 +531,7 @@ def handle_monster(_role_name):
             press_key(_key_list=_skill_one.get('key_list'),
                       _duration=_skill_one.get('duration'),
                       _back_swing=_skill_one.get('back_swing'))
-            time.sleep(SLEEP_SECOND)
+            time.sleep(0.1)
             return
 
 
@@ -541,7 +545,7 @@ def handle_boss(_role_name):
             press_key(_key_list=_skill_one.get('key_list'),
                       _duration=_skill_one.get('duration'),
                       _back_swing=_skill_one.get('back_swing'))
-            time.sleep(SLEEP_SECOND)
+            time.sleep(0.1)
             _count += 1
 
     if _count == 0:
@@ -659,12 +663,9 @@ def play_one_role(_role_index, _role_name):
     # 进入选择角色ui
     to_select_role_ui()
     # 选择角色
-    _window_left, _window_top, _window_right, _window_bottom = get_relative_window_rect(WINDOW_HWND)
-    _window_width = _window_right - _window_left
-    _window_height = _window_bottom - _window_top
     _game_x_percent, _game_y_percent = _role_xy[0], _role_xy[1]
-    _role_x = int(_window_left + _window_width * _game_x_percent)
-    _role_y = int(_window_top + _window_height * _game_y_percent)
+    _role_x = int(WINDOW_LEFT + WINDOW_WIDTH * _game_x_percent)
+    _role_y = int(WINDOW_TOP + WINDOW_HEIGHT * _game_y_percent)
     pydirectinput.moveTo(_role_x, _role_y)
     mouse_left_double_click()
     # 检测到活动的关闭按钮,就点击关闭按钮
@@ -703,7 +704,7 @@ def play():
     time.sleep(SLEEP_SECOND)
 
     role_name_list = ["modao", "naima01", "nailuo", "naima02", "zhaohuan", "saber", "zhanfa", "papading", "naima03"]
-    # role_name_list = ["nailuo"]
+    # role_name_list = ["modao"]
     # =============================play开始===============================
     for role_index, role_name in enumerate(role_name_list):
         play_one_role(role_index, role_name)
