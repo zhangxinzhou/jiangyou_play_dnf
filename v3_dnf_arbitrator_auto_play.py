@@ -556,11 +556,11 @@ def handle_boss(_role_name):
 def handle_dungeon_stage_clear(_role_name):
     _start_time = time.time()
     while True:
-        _cost = time.time() - _start_time
         # 刷图超过60秒放一次大招
+        _cost = time.time() - _start_time
         if _cost > 60:
+            face_to_monster_or_boss()
             handle_boss(_role_name)
-            _start_time = time.time()
         # 退出
         if redis_has_label('dungeon_common_shop_box') or redis_has_label('dungeon_common_continue_box'):
             return
