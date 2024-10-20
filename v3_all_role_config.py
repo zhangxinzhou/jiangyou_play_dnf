@@ -151,6 +151,22 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["q", "a"], "back_swing": 2}
         ]
     },
+    "yuansu": {
+        "role_name": "naima02",
+        "role_xy": [5 / 8, 2 / 3],
+        "handle_buff": [
+            {"key_list": ["up", "down", "space"], "back_swing": 0.8},
+        ],
+        "handle_monster": [
+            {"key_list": ["h"], "back_swing": 1},
+            {"key_list": ["s"], "back_swing": 1},
+            {"key_list": ["f"], "back_swing": 1},
+            {"key_list": ["w"], "back_swing": 1}
+        ],
+        "handle_boss": [
+            {"key_list": ["y"], "back_swing": 2}
+        ]
+    }
 }
 
 ALL_ROLE_DUNGEON_DICT = {
@@ -262,6 +278,18 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_status": "todo",
             "dungeon_round": 4
         }],
+    "yuansu": [
+        {
+            "dungeon_name": "arbitrator",
+            "dungeon_icon": "dungeon_arbitrator_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 0
+        }, {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 4
+        }]
 }
 
 SKILL_BOX_X1 = 538

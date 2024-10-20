@@ -310,6 +310,9 @@ def handle_town_play_quest():
     if not redis_has_label('town_play_quest_ui_header'):
         redis_mouse_left_click_if_has_label('town_play_quest_icon_light')
 
+    if not redis_has_label('town_play_quest_ui_header'):
+        redis_mouse_left_click_if_has_label('town_play_quest_icon_gray')
+
     # 领取任务
     if redis_has_label('town_play_quest_ui_header'):
         # 领取奖励
@@ -437,18 +440,25 @@ def handle_dungeon_stage_start(_role_name):
 # true 可以继续挑战,false 无法继续挑战
 @print_method_name
 def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
-    # wait_label_exists(['dungeon_common_shop_box'])
     if redis_has_label('dungeon_common_shop_box') or redis_has_label('dungeon_common_continue_box'):
         # 维修武器
         press_key(_key_list=['s', 'space'], _back_swing=0.1)
-        time.sleep(3)
+        time.sleep(1)
         # 关闭商店
         press_key(_key_list=['esc'], _back_swing=0.5)
         # 数字0 移动物品 捡东西
         press_key(_key_list=['0'], _back_swing=0.5)
-        # 捡东西(墙角检测不到物品,因此就这样吧)
+        # 拾取物品1
+        wait_all_skill_enable()
         for _i in range(20):
             press_key(_key_list=['x'])
+
+        # 拾取物品2
+        wait_all_skill_enable()
+        for _i in range(20):
+            press_key(_key_list=['x'])
+            if not redis_has_label('dungeon_common_item'):
+                break
 
     # 再次确认关闭商店
     if redis_has_label('dungeon_common_shop_box'):
@@ -703,8 +713,9 @@ def play():
     win32gui.ShowWindow(WINDOW_HWND, win32con.SW_RESTORE)
     time.sleep(SLEEP_SECOND)
 
-    role_name_list = ["modao", "naima01", "nailuo", "naima02", "zhaohuan", "saber", "zhanfa", "papading", "naima03"]
-    # role_name_list = ["modao"]
+    role_name_list = ["modao", "naima01", "nailuo", "naima02", "zhaohuan", "saber", "zhanfa", "papading", "naima03",
+                      "yuansu"]
+    # role_name_list = ["yuansu"]
     # =============================play开始===============================
     for role_index, role_name in enumerate(role_name_list):
         play_one_role(role_index, role_name)
