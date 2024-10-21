@@ -443,7 +443,7 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
     if redis_has_label('dungeon_common_shop_box') or redis_has_label('dungeon_common_continue_box'):
         # 维修武器
         press_key(_key_list=['s', 'space'], _back_swing=0.1)
-        time.sleep(1)
+        time.sleep(3)
         # 关闭商店
         press_key(_key_list=['esc'], _back_swing=0.5)
         # 数字0 移动物品 捡东西
@@ -455,9 +455,12 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
 
         # 拾取物品2
         wait_all_skill_enable()
+        _item_miss = 0
         for _i in range(20):
             press_key(_key_list=['x'])
             if not redis_has_label('dungeon_common_item'):
+                _item_miss += 1
+            if _item_miss > 2:
                 break
 
     # 再次确认关闭商店
