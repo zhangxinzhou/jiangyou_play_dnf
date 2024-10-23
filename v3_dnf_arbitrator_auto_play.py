@@ -670,6 +670,30 @@ def play_one_role(_role_index, _role_name):
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] start')
     # 开始时间
     _start_time = time.time()
+    # 选择角色
+    select_one_role(_role_name)
+    wait_all_skill_enable()
+    # 检测到活动的关闭按钮,就点击关闭按钮
+    for i in range(3):
+        redis_mouse_left_click_if_has_label('town_common_close_button')
+    # 等待交易保护结束
+    if _role_index == 0:
+        wait_transaction_protect_end()
+    # 畅玩任务,领取奖励
+    handle_town_play_quest()
+    # 刷图
+    handle_dungeon_all_round(_role_name)
+    # 再次选择角色
+    select_one_role(_role_name)
+    # 畅玩任务,领取奖励
+    handle_town_play_quest()
+    _cost = time.time() - _start_time
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] end')
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] cost=[{_cost:.2f}] s')
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}]', "*" * 50)
+
+# 选择角色
+def select_one_role(_role_name):
     # 获取角色配置
     _one_role_skill_config = v3_all_role_config.ALL_ROLE_SKILL_DICT.get(_role_name)
     _role_xy = _one_role_skill_config.get('role_xy')
@@ -681,23 +705,6 @@ def play_one_role(_role_index, _role_name):
     _role_y = int(WINDOW_TOP + WINDOW_HEIGHT * _game_y_percent)
     pydirectinput.moveTo(_role_x, _role_y)
     mouse_left_double_click()
-    # 检测到活动的关闭按钮,就点击关闭按钮
-    wait_all_skill_enable()
-    for i in range(3):
-        redis_mouse_left_click_if_has_label('town_common_close_button')
-    # 等待交易保护结束
-    if _role_index == 0:
-        wait_transaction_protect_end()
-    # 畅玩任务,领取奖励
-    handle_town_play_quest()
-    # 刷图
-    handle_dungeon_all_round(_role_name)
-    # 畅玩任务,领取奖励
-    handle_town_play_quest()
-    _cost = time.time() - _start_time
-    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] end')
-    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] cost=[{_cost:.2f}] s')
-    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}]', "*" * 50)
 
 
 @print_method_name
