@@ -683,9 +683,8 @@ def play_one_role(_role_index, _role_name):
     handle_town_play_quest()
     # 刷图
     handle_dungeon_all_round(_role_name)
-    # 再次选择角色
-    select_one_role(_role_name)
-    # 畅玩任务,领取奖励
+    # 领取奖励
+    wait_all_skill_enable()
     handle_town_play_quest()
     _cost = time.time() - _start_time
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] end')
@@ -729,6 +728,12 @@ def play():
     # =============================play开始===============================
     for role_index, role_name in enumerate(role_name_list):
         play_one_role(role_index, role_name)
+
+    # 畅玩任务,领取奖励
+    for role_index, role_name in enumerate(role_name_list):
+        select_one_role(role_name)
+        wait_all_skill_enable()
+        handle_town_play_quest()
     # =============================play开始===============================
 
     # =============================测试开始===============================
