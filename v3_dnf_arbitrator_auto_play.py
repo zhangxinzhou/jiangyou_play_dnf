@@ -308,10 +308,14 @@ def handle_town_play_quest():
 
     # 打开畅玩任务(畅玩任务图标的感叹号识别的不准确)
     if not redis_has_label('town_play_quest_ui_header'):
-        redis_mouse_left_click_if_has_label('town_play_quest_icon_light')
+        press_key(_key_list=['f2'])
+        # f2直接能打开畅玩任务,没必要识别图标了
+        # redis_mouse_left_click_if_has_label('town_play_quest_icon_light')
 
     if not redis_has_label('town_play_quest_ui_header'):
-        redis_mouse_left_click_if_has_label('town_play_quest_icon_gray')
+        press_key(_key_list=['f2'])
+        # f2直接能打开畅玩任务,没必要识别图标了
+        # redis_mouse_left_click_if_has_label('town_play_quest_icon_gray')
 
     # 领取任务
     if redis_has_label('town_play_quest_ui_header'):

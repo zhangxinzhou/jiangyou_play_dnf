@@ -159,7 +159,7 @@ ALL_ROLE_SKILL_DICT = {
         ],
         "handle_monster": [
             {"key_list": ["h"], "back_swing": 1},
-            {"key_list": ["s"], "back_swing": 1},
+            {"key_list": ["g"], "back_swing": 1},
             {"key_list": ["f"], "back_swing": 1},
             {"key_list": ["w"], "back_swing": 1}
         ],
@@ -180,7 +180,7 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 4
+            "dungeon_round": 10
         }],
     "naima01": [
         {
@@ -204,7 +204,7 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 4
+            "dungeon_round": 10
         }],
     "naima02": [
         {
@@ -216,7 +216,7 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 4
+            "dungeon_round": 10
         }],
     "zhaohuan": [
         {
@@ -228,7 +228,7 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 4
+            "dungeon_round": 10
         }],
     "saber": [
         {
@@ -240,7 +240,7 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 4
+            "dungeon_round": 10
         }],
     "zhanfa": [
         {
@@ -264,7 +264,7 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 4
+            "dungeon_round": 10
         }],
     "naima03": [
         {
@@ -276,7 +276,7 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 4
+            "dungeon_round": 10
         }],
     "yuansu": [
         {
@@ -288,7 +288,7 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 4
+            "dungeon_round": 10
         }]
 }
 
