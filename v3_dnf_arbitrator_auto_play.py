@@ -271,11 +271,13 @@ def wait_detection_working():
     _start_time = time.time()
     while True:
         _cost = time.time() - _start_time
-        _detection_working = REDIS_CONN.exists('v3_detection_working')
+        _detection_working = REDIS_CONN.get('v3_detection_working')
         if _cost > 120:
             print_red_color(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] waiting [{_cost}]s, exit')
             sys.exit(-1)
-        if _detection_working == 1:
+        if _detection_working == b'1':
+            print_red_color(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] detection is starting')
+        if _detection_working == b'2':
             print_red_color(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] detection is working')
             break
         # 等待
