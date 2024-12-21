@@ -449,7 +449,7 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
     if redis_has_label('dungeon_common_shop_box') or redis_has_label('dungeon_common_continue_box'):
         # 维修武器
         press_key(_key_list=['s', 'space'], _back_swing=0.1)
-        time.sleep(3)
+        time.sleep(5)
         # 关闭商店
         press_key(_key_list=['esc'], _back_swing=0.5)
         # 数字0 移动物品 捡东西
@@ -459,18 +459,11 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
         for _i in range(20):
             press_key(_key_list=['x'])
 
-        # 拾取物品2
-        wait_all_skill_enable()
-        _item_miss = 0
-        for _i in range(20):
-            press_key(_key_list=['x'])
-            if not redis_has_label('dungeon_common_item'):
-                _item_miss += 1
-            if _item_miss > 2:
-                break
-
     # 再次确认关闭商店
     if redis_has_label('dungeon_common_shop_box'):
+        press_key(_key_list=['esc'], _back_swing=0.5)
+    # 如有esa菜单,关闭
+    if redis_has_label('town_select_menu_ui_header'):
         press_key(_key_list=['esc'], _back_swing=0.5)
 
     if _is_finish:
@@ -636,7 +629,7 @@ def handle_dungeon_all_round(_role_name):
                     f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name:<20}] round=[{_round + 1:>02}/{_MAX_ROUND:>02}] cost=[{_cost:.2f}] s')
                 if not _is_continue:
                     # 到下一个for循环
-                    continue
+                    break
             # redis更新状态
             _one_role_dungeon['dungeon_status'] = 'done'
             _today_redis_key = redis_get_all_role_config_key()
