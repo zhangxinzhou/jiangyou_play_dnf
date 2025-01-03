@@ -335,6 +335,10 @@ def to_select_role_ui():
     if redis_has_label('town_game_start_button'):
         return
 
+    # 检测到活动的关闭按钮,就点击关闭按钮
+    for i in range(RETRY_TIMES):
+        redis_mouse_left_click_if_has_label('town_common_close_button')
+
     # 按esc出现选择菜单
     for i in range(RETRY_TIMES):
         if not redis_has_label('town_select_menu_select_role_light'):
@@ -599,6 +603,10 @@ def handle_dungeon_one_round(_role_name, _is_finish=False) -> bool:
     handle_dungeon_stage_clear(_role_name)
     # 关卡结束
     _is_continue = handle_dungeon_stage_end(_role_name, _is_finish)
+    # 若检测到活动的关闭按钮,就点击关闭按钮
+    if not _is_continue:
+        for i in range(RETRY_TIMES):
+            redis_mouse_left_click_if_has_label('town_common_close_button')
     return _is_continue
 
 
@@ -673,7 +681,7 @@ def play_one_role(_role_index, _role_name):
     select_one_role(_role_name)
     wait_all_skill_enable()
     # 检测到活动的关闭按钮,就点击关闭按钮
-    for i in range(3):
+    for i in range(RETRY_TIMES):
         redis_mouse_left_click_if_has_label('town_common_close_button')
     # 等待交易保护结束
     if _role_index == 0:

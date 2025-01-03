@@ -189,7 +189,10 @@ if __name__ == '__main__':
                         color=(0, 0, 255))
 
             handle_skill(cv2_mat)
-            cv2.imshow(window_name, result.plot(line_width=1, font_size=0.1))
+            # 图片缩放
+            _tmp1 = result.plot(line_width=1, font_size=0.1)
+            _tmp2 = cv2.resize(_tmp1, (0, 0), fx=0.5, fy=0.5)
+            cv2.imshow(window_name, _tmp2)
             key = cv2.waitKey(1)
 
             if key != -1:
