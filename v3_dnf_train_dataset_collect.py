@@ -12,7 +12,7 @@ from pynput import keyboard
 # 暂停
 save_image = False
 
-
+# 用f12来截图
 # 退出和暂停功能的实现
 def on_press(_key):
     global save_image

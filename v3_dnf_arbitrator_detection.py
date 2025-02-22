@@ -15,6 +15,8 @@ from ultralytics import YOLO
 
 import v3_all_role_config
 
+# 图片缩放规模
+fxy = 1
 # 游戏窗口截图所需
 _app = QApplication(sys.argv)
 _screen = QApplication.primaryScreen()
@@ -191,7 +193,7 @@ if __name__ == '__main__':
             handle_skill(cv2_mat)
             # 图片缩放
             _tmp1 = result.plot(line_width=1, font_size=0.1)
-            _tmp2 = cv2.resize(_tmp1, (0, 0), fx=0.5, fy=0.5)
+            _tmp2 = cv2.resize(_tmp1, (0, 0), fx=fxy, fy=fxy)
             cv2.imshow(window_name, _tmp2)
             key = cv2.waitKey(1)
 

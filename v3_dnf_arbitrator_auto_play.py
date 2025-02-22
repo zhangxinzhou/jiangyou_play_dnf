@@ -362,39 +362,35 @@ def to_select_role_ui():
 
 # 进入副本
 @print_method_name
-def to_dungeon_arbitrator(_dungeon_icon):
-    # esc打开菜单
-    for i in range(RETRY_TIMES):
-        time.sleep(SLEEP_SECOND)
-        if not redis_has_label('town_select_menu_teleportation_light'):
-            press_key(_key_list=['esc'], _back_swing=0.1)
-            time.sleep(SLEEP_SECOND)
+def to_dungeon_library():
+    _dungeon_icon = 'dungeon_library_icon'
 
-    # 点击传送阵
-    for i in range(RETRY_TIMES):
-        time.sleep(SLEEP_SECOND)
-        if redis_mouse_left_click_if_has_label('town_select_menu_teleportation_light'):
-            time.sleep(SLEEP_SECOND)
-            break
+    # 如有esa菜单,关闭
+    if redis_has_label('town_select_menu_ui_header'):
+        press_key(_key_list=['esc'], _back_swing=0.5)
 
-    # 因为副本图标识别不准确,当有多个或者单个的时候就按up键,来切换副本icon
-    for i in range(100):
-        _labels_detail_list: list = json.loads(REDIS_CONN.get('labels_detail_list'))
-        _dungeon_icon_count = 0
-        for _one in _labels_detail_list:
-            if _one['name'] == _dungeon_icon:
-                _dungeon_icon_count += 1
-        if _dungeon_icon_count == 1:
-            break
-        else:
-            press_key(_key_list=['up'], _back_swing=0.5)
+    # 按键n打开世界地图，用page down到地图收藏
+    press_key(_key_list=['n'])
+    time.sleep(0.1)
+    press_key(_key_list=['pagedown'])
 
-    # 传送到目标副本区域
+    # 传送到图书馆副本区域
     for i in range(RETRY_TIMES):
         time.sleep(SLEEP_SECOND)
         if redis_mouse_left_click_if_has_label(_dungeon_icon):
             time.sleep(SLEEP_SECOND)
             break
+    time.sleep(2)
+
+    # 移动到第一个入口（蓝色/城镇） TODO 因为每个角色的移动速度是不一样的，固定值需要优化
+    press_key(_key_list=['right'], _duration=1)
+    press_key(_key_list=['down'], _duration=0.4)
+    press_key(_key_list=['right'], _duration=0.5)
+    time.sleep(0.5)
+    # 移动到第二个入口（红色/副本）
+    press_key(_key_list=['up'], _duration=0.2)
+    press_key(_key_list=['right'], _duration=2)
+    time.sleep(0.5)
 
     # 进入副本选择界面
     for i in range(RETRY_TIMES):
@@ -613,15 +609,16 @@ def handle_dungeon_one_round(_role_name, _is_finish=False) -> bool:
 @print_method_name
 def handle_dungeon_all_round(_role_name):
     _one_role_dungeon_list = redis_get_one_role_dungeon_config(_role_name)
+    print("*" * 100)
+    print(_one_role_dungeon_list)
     for _one_role_dungeon in _one_role_dungeon_list:
         _dungeon_name = _one_role_dungeon.get("dungeon_name")
-        _dungeon_icon = _one_role_dungeon.get("dungeon_icon")
         _dungeon_status = _one_role_dungeon.get("dungeon_status")
         _dungeon_round = _one_role_dungeon.get("dungeon_round")
 
         if _dungeon_status == 'todo' and _dungeon_round > 0:
             # 进入目标副本
-            _entry_able = to_dungeon_arbitrator(_dungeon_icon)
+            _entry_able = to_dungeon_library()
             if not _entry_able:
                 print(
                     f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name:<20}] can not enter')
@@ -698,6 +695,7 @@ def play_one_role(_role_index, _role_name):
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] cost=[{_cost:.2f}] s')
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}]', "*" * 50)
 
+
 # 选择角色
 def select_one_role(_role_name):
     # 获取角色配置
@@ -729,8 +727,7 @@ def play():
     win32gui.ShowWindow(WINDOW_HWND, win32con.SW_RESTORE)
     time.sleep(SLEEP_SECOND)
 
-    role_name_list = ["modao", "naima01", "nailuo", "naima02", "zhaohuan", "saber", "zhanfa", "papading", "naima03",
-                      "yuansu"]
+    role_name_list = ["modao", "zhanfa"]
     # role_name_list = ["yuansu"]
     # =============================play开始===============================
     for role_index, role_name in enumerate(role_name_list):
@@ -760,5 +757,31 @@ def play():
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] cost=[{_cost:.2f}] s')
 
 
+@print_method_name
+def single_method_test():
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] test start')
+    # 开始时间
+    _start_time = time.time()
+    time.sleep(SLEEP_SECOND)
+
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] waiting detection working')
+    wait_detection_working()
+
+    # 被其他窗口遮挡，调用后放到最前面
+    win32gui.SetForegroundWindow(WINDOW_HWND)
+    # 解决被最小化的情况
+    win32gui.ShowWindow(WINDOW_HWND, win32con.SW_RESTORE)
+    time.sleep(SLEEP_SECOND)
+
+    # =============================待测试的单个方案===============================
+    to_dungeon_library()
+    # =============================待测试的单个方案===============================
+
+    # 计算耗时
+    _cost = time.time() - _start_time
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] test end')
+
+
 if __name__ == '__main__':
     play()
+    # single_method_test()

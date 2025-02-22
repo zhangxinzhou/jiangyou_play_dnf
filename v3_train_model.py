@@ -42,5 +42,6 @@ def train_model():
 
 
 if __name__ == '__main__':
+    # 将数据集的classes.txt文件转换为yaml文件
     handle_detasets_ymal()
     train_model()
