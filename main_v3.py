@@ -13,4 +13,12 @@ if __name__ == '__main__':
     os.system('cmd /c start "detection_job" python v3_dnf_arbitrator_detection.py')
     # 启动play
     time.sleep(1)
-    v3_dnf_arbitrator_auto_play.play()
+    try:
+        v3_dnf_arbitrator_auto_play.play()
+    except:
+        print("system error, exit")
+    else:
+        print("system run success,exit")
+    finally:
+        # 最后关机 300秒
+        os.system('shutdown -s -t 300')
