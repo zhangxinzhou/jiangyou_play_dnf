@@ -63,7 +63,7 @@ listener = keyboard.Listener(on_press=on_press)
 listener.start()
 
 # redis
-REDIS_POOL = redis.ConnectionPool(host='127.0.0.1', port=6379)
+REDIS_POOL = redis.ConnectionPool(host='localhost', port=6379)
 REDIS_CONN = redis.Redis(connection_pool=REDIS_POOL, decode_responses=True)
 
 

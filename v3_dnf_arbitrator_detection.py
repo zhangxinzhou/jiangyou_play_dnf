@@ -23,7 +23,7 @@ _screen = QApplication.primaryScreen()
 
 # redis 用来存储识别到的labels的相关信息,供play程序使用
 # redis_conn = redis.Redis(host='127.0.0.1', port='6379')
-redis_pool = redis.ConnectionPool(host='127.0.0.1', port=6379)
+redis_pool = redis.ConnectionPool(host='localhost', port=6379)
 redis_conn = redis.Redis(connection_pool=redis_pool)
 
 
