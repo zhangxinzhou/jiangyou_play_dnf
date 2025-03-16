@@ -16,7 +16,7 @@ from ultralytics import YOLO
 import v3_all_role_config
 
 # 图片缩放规模
-fxy = 1
+fxy = 0.75
 # 游戏窗口截图所需
 _app = QApplication(sys.argv)
 _screen = QApplication.primaryScreen()
