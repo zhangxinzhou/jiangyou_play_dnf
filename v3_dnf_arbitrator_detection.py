@@ -16,7 +16,7 @@ from ultralytics import YOLO
 import v3_all_role_config
 
 # 图片缩放规模
-fxy = 0.75
+fxy = 1
 # 游戏窗口截图所需
 _app = QApplication(sys.argv)
 _screen = QApplication.primaryScreen()
@@ -197,5 +197,6 @@ if __name__ == '__main__':
             cv2.imshow(window_name, _tmp2)
             key = cv2.waitKey(1)
 
-            if key != -1:
+            # esc键退出
+            if key == 27:
                 break

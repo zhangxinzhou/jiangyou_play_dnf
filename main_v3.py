@@ -15,10 +15,14 @@ if __name__ == '__main__':
     time.sleep(1)
     try:
         v3_dnf_arbitrator_auto_play.play()
-    except:
+    except Exception as e:
         print("system error, exit")
+        print(e)
     else:
         print("system run success,exit")
     finally:
         # 最后关机 300秒
-        os.system('shutdown -s -t 300')
+        # os.system('shutdown -s -t 300')
+        print("finish")
+
+
