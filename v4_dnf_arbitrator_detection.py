@@ -3,6 +3,7 @@ import ctypes.wintypes
 import json
 import sys
 import time
+from typing import Any
 
 import cv2
 import numpy as np
@@ -12,6 +13,7 @@ import win32gui
 from PyQt5.QtGui import QImage
 from PyQt5.QtWidgets import QApplication
 from ultralytics import YOLO
+import queue
 
 import v3_all_role_config
 
@@ -95,6 +97,22 @@ def handle_skill(_cv2_mat):
     redis_conn.hset('skill', f'all', 'Y' if _all_y else 'N')
 
 
+# 队列
+q = queue.Queue()
+# 队列存储最大帧数
+MAX_GAME_FRAME = 10
+
+
+# 获取最近N帧的数据
+def get_last_n_labels_detail_dict(obj: object) -> list[Any]:
+    q.put(obj)
+    if q.qsize() > MAX_GAME_FRAME:
+        q.get()
+    _l = list(q.queue)
+    _l.reverse()
+    return _l
+
+
 if __name__ == '__main__':
     # 监测是否已经启动的检测,如果已经启动就不要重复启动
     _detection_working = redis_conn.exists('v3_detection_working')
@@ -173,9 +191,12 @@ if __name__ == '__main__':
                     cv2.line(cv2_mat, pt1=(x - arrow_len, y), pt2=(x + arrow_len, y), color=(0, 0, 255), thickness=3)
 
         # 无论是否有检测到目标，都将检测信息写入redis
+        last_n_labels_detail_dict = get_last_n_labels_detail_dict(labels_detail_dict)
         redis_conn.set(name='v3_detection_working', value='2', ex=1)
         redis_conn.set(name='labels_detail_list', value=json.dumps(labels_detail_list))
         redis_conn.set(name='labels_detail_dict', value=json.dumps(labels_detail_dict))
+        # 取最近的N帧数据，希望这样可以不用重试机制，提升运行效率
+        redis_conn.set(name='last_n_labels_detail_dict', value=json.dumps(last_n_labels_detail_dict))
 
         # 需要查看监测的结果,就将show_window改为True
         show_window = True
