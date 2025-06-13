@@ -196,6 +196,7 @@ def redis_has_label(_label) -> bool:
     return False
 
 
+# 模糊搜索label
 def redis_fuzzy_search_label(_label) -> bool:
     _last_n_labels = redis_get_last_n_labels_detail()
     for _index, _one in enumerate(_last_n_labels):
@@ -400,7 +401,7 @@ def to_dungeon_admirers():
     time.sleep(0.1)
     press_key(_key_list=['pagedown'])
 
-    # 传送到图书馆副本区域
+    # 传送到终末崇拜者
     for i in range(RETRY_TIMES):
         time.sleep(SLEEP_SECOND)
         if redis_mouse_left_click_if_has_label(_dungeon_icon):
@@ -409,14 +410,8 @@ def to_dungeon_admirers():
     time.sleep(2)
 
     # 移动到第一个入口（蓝色/城镇）
-    press_key(_key_list=['left'], _duration=5)
-
-    # 进入副本选择界面
-    for i in range(RETRY_TIMES):
-        time.sleep(SLEEP_SECOND)
-        press_key(_key_list=['right'], _duration=2)
-        if redis_has_label(_dungeon_icon):
-            break
+    press_key(_key_list=['right'], _duration=0.5)
+    press_key(_key_list=['left'], _duration=2)
 
     # 点击副本icon
     for i in range(3):
@@ -480,52 +475,56 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
     if redis_has_label('town_select_menu_ui_header'):
         press_key(_key_list=['esc'], _back_swing=0.5)
 
-    if _is_finish:
-        press_key(_key_list=['f12'], _back_swing=2)
-        return False
-    elif redis_has_label('dungeon_common_continue_gray'):
-        print_red_color(
-            f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] identify label=[dungeon_common_continue_gray]')
-        press_key(_key_list=['f12'], _back_swing=2)
-        return False
-    elif redis_has_label('dungeon_common_continue_normal'):
-        press_key(_key_list=['f10'], _back_swing=2)
-        return True
-    else:
-        press_key(_key_list=['f12'], _back_swing=2)
-        return False
+    for i in range(3):
+        if _is_finish:
+            press_key(_key_list=['f12'], _back_swing=2)
+            return False
+        elif redis_has_label('dungeon_common_continue_gray'):
+            print_red_color(
+                f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] identify label=[dungeon_common_continue_gray]')
+            press_key(_key_list=['f12'], _back_swing=2)
+            return False
+        elif redis_has_label('dungeon_common_continue_normal'):
+            press_key(_key_list=['f10'], _back_swing=2)
+            return True
+    press_key(_key_list=['f12'], _back_swing=2)
+    return False
 
 
 @print_method_name
 def role_run():
-    # 退出条件
-    if redis_fuzzy_search_label('monster') or redis_fuzzy_search_label(
-            'boss') or redis_fuzzy_search_label(
-        'star_box') or redis_has_label(
-        'dungeon_common_shop_box' or redis_has_label('dungeon_common_continue_box')):
-        return
+    # 先判断是否满足run的条件
+    _exit_fuzzy_label_list = ['monster', 'boss']
+    _exit_precise_label_list = ['dungeon_common_continue_box', 'dungeon_common_shop_box']
+    for _label_name in _exit_precise_label_list:
+        if redis_has_label(_label_name):
+            return
+    for _label_name in _exit_fuzzy_label_list:
+        if redis_fuzzy_search_label(_label_name):
+            return
 
-    # 判断是否可以跑
-    _start_time = time.time()
-    while True:
-        time.sleep(SLEEP_SECOND)
-        if time.time() - _start_time > 5:
-            break
-        if redis_get_skill_able('all'):
-            break
-
+    # 开始跑
     pydirectinput.press('right')
     time.sleep(SLEEP_SECOND)
     pydirectinput.keyDown('right')
-    time.sleep(SLEEP_SECOND)
+    # 结束跑
+    _start_time = time.time()
     while True:
-        if redis_fuzzy_search_label('monster') or redis_fuzzy_search_label(
-                'boss') or redis_fuzzy_search_label(
-            'star_box') or redis_has_label(
-            'dungeon_common_shop_box' or redis_has_label('dungeon_common_continue_box')):
+        time.sleep(SLEEP_SECOND)
+        # # 如果有移动箭头的提示，继续run
+        # if redis_has_label('dungeon_common_arrow'):
+        #     break
+        if time.time() - _start_time > 5:
             pydirectinput.keyUp('right')
             return
-        time.sleep(SLEEP_SECOND)
+        for _label_name in _exit_precise_label_list:
+            if redis_has_label(_label_name):
+                pydirectinput.keyUp('right')
+                return
+        for _label_name in _exit_fuzzy_label_list:
+            if redis_fuzzy_search_label(_label_name):
+                pydirectinput.keyUp('right')
+                return
 
 
 @print_method_name

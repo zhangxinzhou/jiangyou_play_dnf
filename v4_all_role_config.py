@@ -175,15 +175,15 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 2
+            "dungeon_round": 10
         }],
     "zhanfa": [
         {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 2
-        }]
+            "dungeon_round": 10
+        }],
 }
 
 SKILL_BOX_X1 = 538
