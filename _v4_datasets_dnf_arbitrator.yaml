@@ -1,0 +1,75 @@
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+# COCO128 dataset https://www.kaggle.com/ultralytics/coco128 (first 128 images from COCO xxx2017) by Ultralytics
+# Documentation: https://docs.ultralytics.com/datasets/detect/coco/
+# Example usage: yolo train data=_datasets_dnf_arbitrator.yaml
+# parent
+# ├── ultralytics
+# └── datasets
+#     └── coco128  ← downloads here (7 MB)
+
+# Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
+path: D:\repository\git\jiangyou_play_dnf\datasets\v4_dnf_arbitrator
+train: images
+val: images
+test:
+names:
+  0: ___town___
+  1: town_role
+  2: town_entrance_blue
+  3: town_entrance_red
+  4: town_common_close_button
+  5: town_select_role_icon
+  6: town_select_role_ui
+  7: town_game_start_button
+  8: town_transaction_protection_icon
+  9: town_confirmation_dialog
+  10: ___town_select_menu___
+  11: town_select_menu_ui_header
+  12: town_select_menu_ui_close_button
+  13: town_select_menu_ui_back_town_gray
+  14: town_select_menu_ui_back_town_light
+  15: town_select_menu_teleportation_gray
+  16: town_select_menu_teleportation_light
+  17: town_select_menu_select_role_gray
+  18: town_select_menu_select_role_light
+  19: ___town_play_quest___
+  20: town_play_quest_icon_gray
+  21: town_play_quest_icon_light
+  22: town_play_quest_ui_header
+  23: town_play_quest_ui_close_button
+  24: town_play_quest_claim_gray
+  25: town_play_quest_claim_light
+  26: town_play_quest_claim_guide
+  27: town_play_quest_claim_all_gray
+  28: town_play_quest_claim_all_light
+  29: town_play_quest_claim_go
+  30: ___dungeon_common___
+  31: dungeon_common_arrow
+  32: dungeon_common_item
+  33: dungeon_common_shop_box
+  34: dungeon_common_continue_box
+  35: dungeon_common_continue_normal
+  36: dungeon_common_continue_gray
+  37: dungeon_common_entry_enable
+  38: dungeon_common_entry_disable
+  39: dungeon_common_pl_enable
+  40: dungeon_common_pl_disable
+  41: ___dungeon_arbitrator____
+  42: dungeon_arbitrator_icon
+  43: dungeon_arbitrator_boss_box
+  44: dungeon_arbitrator_boss
+  45: dungeon_arbitrator_monster_rock
+  46: dungeon_arbitrator_monster_girl
+  47: dungeon_arbitrator_star_box_ball
+  48: dungeon_arbitrator_star_box_cube
+  49: ___dungeon_library____
+  50: dungeon_library_icon
+  51: dungeon_library_monster_boy
+  52: dungeon_library_monster_girl
+  53: dungeon_library_boss_box
+  54: ___dungeon_admirers____
+  55: dungeon_admirers_icon
+  56: dungeon_admirers_monster
+  57: dungeon_admirers_boss_box
+  58: dungeon_admirers_boss
+  59: dungeon_admirers_gap

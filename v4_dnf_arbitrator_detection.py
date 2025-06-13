@@ -1,6 +1,7 @@
 import ctypes
 import ctypes.wintypes
 import json
+import queue
 import sys
 import time
 from typing import Any
@@ -13,9 +14,8 @@ import win32gui
 from PyQt5.QtGui import QImage
 from PyQt5.QtWidgets import QApplication
 from ultralytics import YOLO
-import queue
 
-import v3_all_role_config
+import v4_all_role_config as role_config
 
 # 图片缩放规模
 fxy = 1
@@ -71,14 +71,14 @@ COLOR_GREEN = (0, 255, 0)
 
 # 判断技能是否可用的方法
 def handle_skill(_cv2_mat):
-    _box_x1 = v3_all_role_config.SKILL_BOX_X1
-    _box_x2 = v3_all_role_config.SKILL_BOX_X2
-    _box_y1 = v3_all_role_config.SKILL_BOX_Y1
-    _box_y2 = v3_all_role_config.SKILL_BOX_Y2
+    _box_x1 = role_config.SKILL_BOX_X1
+    _box_x2 = role_config.SKILL_BOX_X2
+    _box_y1 = role_config.SKILL_BOX_Y1
+    _box_y2 = role_config.SKILL_BOX_Y2
     # 具体技能
     _all_count_y = 0
     _all_count = 0
-    for _skill_key, _skill_xy in v3_all_role_config.SKILL_ICON_LOCATION.items():
+    for _skill_key, _skill_xy in role_config.SKILL_ICON_LOCATION.items():
         _pt1_x, _pt1_y, _pt2_x, _pt2_y = _skill_xy
         _pt1, _pt2 = (_pt1_x, _pt1_y), (_pt2_x, _pt2_y)
         # 判断技能是否可用
@@ -129,7 +129,7 @@ if __name__ == '__main__':
         print(f"can not find game [{window_title}]")
         exit(-1)
     print('start loading model')
-    model_path = r"models/best.pt"
+    model_path = r"models/v4_best.pt"
     model = YOLO(model_path)
     print('end loading model')
 

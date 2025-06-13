@@ -124,7 +124,7 @@ if __name__ == '__main__':
         print(f"can not find game [{window_title}]")
         exit(-1)
     print('start loading model')
-    model_path = r"models/best.pt"
+    model_path = r"models/v3_best.pt"
     model = YOLO(model_path)
     print('end loading model')
 
