@@ -20,7 +20,7 @@ ALL_ROLE_SKILL_DICT = {
     },
     "naima01": {
         "role_name": "naima01",
-        "role_xy": [3 / 8, 1 / 3],
+        "role_xy": [1 / 8, 2 / 3],
         "handle_buff": [
             {"key_list": ["right", "right", "space"], "back_swing": 0.5},
             {"key_list": ["up", "up", "space"], "back_swing": 0.5},
@@ -36,7 +36,7 @@ ALL_ROLE_SKILL_DICT = {
     },
     "nailuo": {
         "role_name": "nailuo",
-        "role_xy": [4 / 8, 1 / 3],
+        "role_xy": [6 / 8, 1 / 3],
         "handle_buff": [
             {"key_list": ["right", "right", "space"], "back_swing": 2},
             {"key_list": ["up", "up", "space"], "back_swing": 0.5}
@@ -51,7 +51,7 @@ ALL_ROLE_SKILL_DICT = {
     },
     "naima02": {
         "role_name": "naima02",
-        "role_xy": [5 / 8, 1 / 3],
+        "role_xy": [2 / 8, 2 / 3],
         "handle_buff": [
             {"key_list": ["right", "right", "space"], "back_swing": 0.5},
             {"key_list": ["up", "up", "space"], "back_swing": 0.5},
@@ -67,7 +67,7 @@ ALL_ROLE_SKILL_DICT = {
     },
     "zhaohuan": {
         "role_name": "zhaohuan",
-        "role_xy": [6 / 8, 1 / 3],
+        "role_xy": [4 / 8, 1 / 3],
         "handle_buff": [
             {"key_list": ["q"], "back_swing": 2},
             {"key_list": ["r"], "back_swing": 0.5},
@@ -85,7 +85,7 @@ ALL_ROLE_SKILL_DICT = {
     },
     "saber": {
         "role_name": "saber",
-        "role_xy": [1 / 8, 2 / 3],
+        "role_xy": [4 / 8, 2 / 3],
         "handle_buff": [
             {"key_list": ["q", "left"], "duration": 0.3, "back_swing": 1},
             {"key_list": ["right", "right", "space"], "back_swing": 0.5},
@@ -111,7 +111,10 @@ ALL_ROLE_SKILL_DICT = {
         "handle_monster": [
             {"key_list": ["e"], "back_swing": 0.5},
             {"key_list": ["g"], "back_swing": 0.5},
-            {"key_list": ["h"], "back_swing": 0.5}
+            {"key_list": ["h"], "back_swing": 0.5},
+            {"key_list": ["d"], "back_swing": 0.5},
+            {"key_list": ["s"], "back_swing": 0.5},
+            {"key_list": ["a"], "back_swing": 0.5}
         ],
         "handle_boss": [
             {"key_list": ["e"], "back_swing": 0.5}
@@ -119,7 +122,7 @@ ALL_ROLE_SKILL_DICT = {
     },
     "papading": {
         "role_name": "papading",
-        "role_xy": [3 / 8, 2 / 3],
+        "role_xy": [6 / 8, 2 / 3],
         "handle_buff": [
             {"key_list": ["right", "right", "space"], "back_swing": 0.5},
         ],
@@ -137,7 +140,7 @@ ALL_ROLE_SKILL_DICT = {
     },
     "naima03": {
         "role_name": "naima02",
-        "role_xy": [4 / 8, 2 / 3],
+        "role_xy": [3 / 8, 2 / 3],
         "handle_buff": [
             {"key_list": ["right", "right", "space"], "back_swing": 0.8},
             {"key_list": ["up", "up", "space"], "back_swing": 0.8},
@@ -153,18 +156,18 @@ ALL_ROLE_SKILL_DICT = {
     },
     "yuansu": {
         "role_name": "naima02",
-        "role_xy": [5 / 8, 2 / 3],
+        "role_xy": [5 / 8, 1 / 3],
         "handle_buff": [
             {"key_list": ["up", "down", "space"], "back_swing": 0.8},
         ],
         "handle_monster": [
-            {"key_list": ["h"], "back_swing": 1},
             {"key_list": ["g"], "back_swing": 1},
             {"key_list": ["f"], "back_swing": 1},
-            {"key_list": ["w"], "back_swing": 1}
+            {"key_list": ["d"], "back_swing": 1},
+            {"key_list": ["a"], "back_swing": 1}
         ],
         "handle_boss": [
-            {"key_list": ["y"], "back_swing": 2}
+            {"key_list": ["g"], "back_swing": 1}
         ]
     }
 }
@@ -175,15 +178,72 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 10
+            "dungeon_round": 20
         }],
     "zhanfa": [
         {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
             "dungeon_status": "todo",
-            "dungeon_round": 10
+            "dungeon_round": 20
         }],
+    "zhaohuan": [
+        {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 20
+        }],
+    "yuansu": [
+        {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 20
+        }],
+    "nailuo": [
+        {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 20
+        }],
+    "naima01": [
+        {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 20
+        }],
+    "naima02": [
+        {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 20
+        }],
+    "naima03": [
+        {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 20
+        }],
+    "saber": [
+        {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 20
+        }],
+    "papading": [
+        {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 20
+        }],
+
 }
 
 SKILL_BOX_X1 = 538

@@ -336,24 +336,25 @@ def handle_town_play_quest():
     wait_all_skill_enable()
 
     # 打开畅玩任务(畅玩任务图标的感叹号识别的不准确)
-    if not redis_has_label('town_play_quest_ui_header'):
-        press_key(_key_list=['f2'])
-        # f2直接能打开畅玩任务,没必要识别图标了
-        # redis_mouse_left_click_if_has_label('town_play_quest_icon_light')
-
-    if not redis_has_label('town_play_quest_ui_header'):
-        press_key(_key_list=['f2'])
-        # f2直接能打开畅玩任务,没必要识别图标了
-        # redis_mouse_left_click_if_has_label('town_play_quest_icon_gray')
+    for i in range(3):
+        if not redis_has_label('town_play_quest_ui_header'):
+            press_key(_key_list=['f2'])
+            time.sleep(0.1)
+            break
 
     # 领取任务
-    if redis_has_label('town_play_quest_ui_header'):
-        # 领取奖励
-        for i in range(10):
-            if not redis_mouse_left_click_if_has_label('town_play_quest_claim_light'):
-                break
-        # 关闭畅玩任务
-        press_key(_key_list=['esc'], _back_swing=0.5)
+    for i in range(3):
+        if redis_mouse_left_click_if_has_label('town_play_quest_claim_all_light'):
+            press_key(_key_list=['space'])
+            time.sleep(0.1)
+            pass
+
+    # 关闭畅玩任务
+    for i in range(3):
+        if redis_has_label('town_play_quest_ui_header'):
+            press_key(_key_list=['f2'])
+            time.sleep(0.1)
+            break
 
 
 @print_method_name
@@ -410,8 +411,8 @@ def to_dungeon_admirers():
     time.sleep(2)
 
     # 移动到第一个入口（蓝色/城镇）
-    press_key(_key_list=['right'], _duration=0.5)
-    press_key(_key_list=['left'], _duration=2)
+    press_key(_key_list=['right'], _duration=0.2)
+    press_key(_key_list=['left'], _duration=1)
 
     # 点击副本icon
     for i in range(3):
@@ -462,6 +463,9 @@ def handle_dungeon_stage_start(_role_name):
 def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
     if redis_has_label('dungeon_common_continue_box') or redis_has_label('dungeon_common_shop_box'):
         # 数字0 移动物品 捡东西
+        time.sleep(2)
+        press_key(_key_list=['left'], _duration=0.5)
+        time.sleep(1)
         press_key(_key_list=['0'], _back_swing=0.5)
         # 拾取物品1
         wait_all_skill_enable()
@@ -487,6 +491,11 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
         elif redis_has_label('dungeon_common_continue_normal'):
             press_key(_key_list=['f10'], _back_swing=2)
             return True
+
+    # 终结
+    if redis_has_label('dungeon_common_arrow'):
+        return True
+
     press_key(_key_list=['f12'], _back_swing=2)
     return False
 
@@ -612,9 +621,10 @@ def handle_dungeon_stage_clear(_role_name):
 
 
 @print_method_name
-def handle_dungeon_one_round(_role_name, _is_finish=False) -> bool:
+def handle_dungeon_one_round(_role_name, _is_finish=False, _round=0) -> bool:
     # 上buff
-    handle_dungeon_stage_start(_role_name)
+    if _round == 0:
+        handle_dungeon_stage_start(_role_name)
     # 刷图
     handle_dungeon_stage_clear(_role_name)
     # 关卡结束
@@ -648,7 +658,7 @@ def handle_dungeon_all_round(_role_name):
             for _round in range(_MAX_ROUND):
                 _start_time = time.time()
                 _is_finish = _round + 1 == _MAX_ROUND
-                _is_continue = handle_dungeon_one_round(_role_name, _is_finish)
+                _is_continue = handle_dungeon_one_round(_role_name, _is_finish, _round)
                 _cost = time.time() - _start_time
                 print(
                     f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] dungeon_name=[{_dungeon_name:<20}] round=[{_round + 1:>02}/{_MAX_ROUND:>02}] cost=[{_cost:.2f}] s')
@@ -703,8 +713,6 @@ def play_one_role(_role_index, _role_name):
     # 等待交易保护结束
     if _role_index == 0:
         wait_transaction_protect_end()
-    # 畅玩任务,领取奖励
-    # handle_town_play_quest()
     # 刷图
     handle_dungeon_all_round(_role_name)
     # 领取奖励
@@ -748,7 +756,8 @@ def play():
     win32gui.ShowWindow(WINDOW_HWND, win32con.SW_RESTORE)
     time.sleep(SLEEP_SECOND)
 
-    role_name_list = ["modao", "zhanfa"]
+    role_name_list = ["modao", "zhanfa", "zhaohuan", "yuansu", "nailuo", "naima01", "naima02", "naima03", "saber",
+                      "papading"]
     # role_name_list = ["yuansu"]
     # =============================play开始===============================
     for role_index, role_name in enumerate(role_name_list):
@@ -761,17 +770,6 @@ def play():
     #     handle_town_play_quest()
 
     # =============================play开始===============================
-
-    # =============================测试开始===============================
-    # 测试单个角色刷图
-    # handle_dungeon_all_round('papading')
-    # 测试单个角色
-    # play_one_role('naima02')
-    # 测试移动到地下城仲裁者
-    # to_dungeon_arbitrator('dungeon_arbitrator_icon')
-    # 测试移动到地下城缥缈店书库
-    # to_dungeon_arbitrator('dungeon_library_icon')
-    # =============================测试结束===============================
 
     # 计算耗时
     _cost = time.time() - _start_time
