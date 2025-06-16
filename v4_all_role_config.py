@@ -84,7 +84,7 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["r"], "back_swing": 1},
         ],
         "handle_boss": [
-            {"key_list": ["y"], "back_swing": 2}
+            {"key_list": ["ctrl"], "back_swing": 1}
         ]
     },
     "saber": {
@@ -98,11 +98,12 @@ ALL_ROLE_SKILL_DICT = {
         "handle_monster": [
             {"key_list": ["s"], "duration": 0.8, "back_swing": 0.5},
             {"key_list": ["f"], "duration": 0.8, "back_swing": 0.5},
-            {"key_list": ["h"], "duration": 0.8, "back_swing": 0.5}
+            {"key_list": ["d"], "duration": 0.8, "back_swing": 0.5},
+            {"key_list": ["h"], "duration": 0.8, "back_swing": 0.5},
+            {"key_list": ["a"], "duration": 0.8, "back_swing": 0.5}
         ],
         "handle_boss": [
             {"key_list": ["g"], "back_swing": 2},
-            {"key_list": ["r"], "back_swing": 5}
         ]
     },
     "zhanfa": {
@@ -188,7 +189,7 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["a"], "back_swing": 1}
         ],
         "handle_boss": [
-            {"key_list": ["y"], "back_swing": 5}
+            {"key_list": ["g"], "back_swing": 5}
         ]
     },
     "huahua": {

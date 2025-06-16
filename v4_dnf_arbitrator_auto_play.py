@@ -182,8 +182,8 @@ def redis_get_labels_detail() -> (list, dict):
 def redis_has_label(_label) -> bool:
     _last_n_labels = redis_get_last_n_labels_detail()
     for _index, _one in enumerate(_last_n_labels):
-        # 只关注最近3帧
-        if _index > 2:
+        # 只关注最近N帧
+        if _index > 4:
             return False
         _labels_dict: dict = _one
         if _labels_dict is None:
@@ -469,12 +469,15 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
         press_key(_key_list=['0'], _back_swing=0.5)
         # 拾取物品1
         wait_all_skill_enable()
-        for _i in range(20):
-            press_key(_key_list=['x'])
+        # for _i in range(20):
+        #     press_key(_key_list=['x'])
+        # 维修装备
+        time.sleep(2)
+        press_key(_key_list=['s', 'space'], _back_swing=1)
+        press_key(_key_list=['esc'], _back_swing=1)
 
     # 再次确认关闭商店
     if redis_has_label('dungeon_common_shop_box'):
-        press_key(_key_list=['s', 'space'], _back_swing=3)
         press_key(_key_list=['esc'], _back_swing=0.5)
     # 如有esa菜单,关闭
     if redis_has_label('town_select_menu_ui_header'):
