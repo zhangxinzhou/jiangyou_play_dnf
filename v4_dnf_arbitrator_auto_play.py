@@ -472,6 +472,12 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
         for _i in range(20):
             press_key(_key_list=['x'])
 
+        # 维修，并关闭商店
+        press_key(_key_list=['s'], _back_swing=0.5)
+        press_key(_key_list=['space'], _back_swing=0.5)
+        press_key(_key_list=['esc'], _back_swing=0.5)
+        time.sleep(0.5)
+
     # 再次确认关闭商店
     if redis_has_label('dungeon_common_shop_box'):
         press_key(_key_list=['esc'], _back_swing=0.5)
@@ -757,7 +763,7 @@ def play():
     time.sleep(SLEEP_SECOND)
 
     role_name_list = ["modao", "zhanfa", "zhaohuan", "yuansu", "nailuo", "naima01", "naima02", "naima03", "saber",
-                      "papading"]
+                      "papading","xiaoxiami","huahua"]
     # role_name_list = ["yuansu"]
     # =============================play开始===============================
     for role_index, role_name in enumerate(role_name_list):

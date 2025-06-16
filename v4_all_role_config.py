@@ -139,7 +139,7 @@ ALL_ROLE_SKILL_DICT = {
         ]
     },
     "naima03": {
-        "role_name": "naima02",
+        "role_name": "naima03",
         "role_xy": [3 / 8, 2 / 3],
         "handle_buff": [
             {"key_list": ["right", "right", "space"], "back_swing": 0.8},
@@ -155,10 +155,43 @@ ALL_ROLE_SKILL_DICT = {
         ]
     },
     "yuansu": {
-        "role_name": "naima02",
+        "role_name": "yuansu",
         "role_xy": [5 / 8, 1 / 3],
         "handle_buff": [
             {"key_list": ["up", "down", "space"], "back_swing": 0.8},
+        ],
+        "handle_monster": [
+            {"key_list": ["g"], "back_swing": 1},
+            {"key_list": ["f"], "back_swing": 1},
+            {"key_list": ["d"], "back_swing": 1},
+            {"key_list": ["a"], "back_swing": 1}
+        ],
+        "handle_boss": [
+            {"key_list": ["g"], "back_swing": 1}
+        ]
+    },
+    "xiaoxiami": {
+        "role_name": "xiaoxiami",
+        "role_xy": [5 / 8, 2 / 3],
+        "handle_buff": [
+            {"key_list": ["right", "right", "space"], "back_swing": 0.8},
+        ],
+        "handle_monster": [
+            {"key_list": ["d"], "back_swing": 1},
+            {"key_list": ["f"], "back_swing": 1},
+            {"key_list": ["s"], "back_swing": 1},
+            {"key_list": ["a"], "back_swing": 1}
+        ],
+        "handle_boss": [
+            {"key_list": ["y"], "back_swing": 5}
+        ]
+    },
+    "huahua": {
+        "role_name": "huahua",
+        "role_xy": [7 / 8, 2 / 3],
+        "handle_buff": [
+            {"key_list": ["right", "right", "space"], "back_swing": 1},
+            {"key_list": ["up", "up", "space"], "back_swing": 1},
         ],
         "handle_monster": [
             {"key_list": ["g"], "back_swing": 1},
@@ -237,6 +270,20 @@ ALL_ROLE_DUNGEON_DICT = {
             "dungeon_round": 20
         }],
     "papading": [
+        {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 20
+        }],
+    "xiaoxiami": [
+        {
+            "dungeon_name": "library",
+            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_status": "todo",
+            "dungeon_round": 20
+        }],
+    "huahua": [
         {
             "dungeon_name": "library",
             "dungeon_icon": "dungeon_library_icon",
