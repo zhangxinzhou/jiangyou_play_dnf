@@ -28,8 +28,8 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["e"], "back_swing": 0.5}
         ],
         "handle_monster": [
-            {"key_list": ["f"], "back_swing": 1},
             {"key_list": ["s"], "back_swing": 1},
+            {"key_list": ["f"], "back_swing": 1},
             {"key_list": ["q"], "back_swing": 1},
         ],
         "handle_boss": [
@@ -61,8 +61,8 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["e"], "back_swing": 0.5}
         ],
         "handle_monster": [
-            {"key_list": ["f"], "back_swing": 1},
             {"key_list": ["s"], "back_swing": 1},
+            {"key_list": ["f"], "back_swing": 1},
             {"key_list": ["q"], "back_swing": 1},
         ],
         "handle_boss": [
@@ -152,8 +152,8 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["e"], "back_swing": 0.5}
         ],
         "handle_monster": [
-            {"key_list": ["f"], "back_swing": 1},
             {"key_list": ["s"], "back_swing": 1},
+            {"key_list": ["f"], "back_swing": 1},
             {"key_list": ["q"], "back_swing": 1},
         ],
         "handle_boss": [

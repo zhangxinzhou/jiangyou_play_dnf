@@ -382,6 +382,7 @@ def to_select_role_ui():
     # 存在游戏开始菜单,结束
     for i in range(RETRY_TIMES):
         if redis_has_label('town_game_start_button'):
+            time.sleep(1)
             return
 
     print('can not find labels [town_game_start_button]')
@@ -474,7 +475,7 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
         # 维修装备
         time.sleep(2)
         press_key(_key_list=['s', 'space'], _back_swing=1)
-        press_key(_key_list=['esc'], _back_swing=1)
+        press_key(_key_list=['esc', 'esc'], _back_swing=1)
 
     # 再次确认关闭商店
     if redis_has_label('dungeon_common_shop_box'):
