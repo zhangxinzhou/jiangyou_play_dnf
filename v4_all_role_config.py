@@ -15,8 +15,8 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["t"], "back_swing": 0.5}
         ],
         "handle_boss": [
-            {"key_list": ["t"], "back_swing": 1},
-            {"key_list": ["r"], "back_swing": 1}
+            # {"key_list": ["t"], "back_swing": 1},
+            # {"key_list": ["r"], "back_swing": 1}
         ]
     },
     "naima01": {
@@ -103,7 +103,7 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["a"], "duration": 0.8, "back_swing": 0.5}
         ],
         "handle_boss": [
-            {"key_list": ["g"], "back_swing": 2},
+            # {"key_list": ["g"], "back_swing": 2},
         ]
     },
     "zhanfa": {
@@ -122,7 +122,7 @@ ALL_ROLE_SKILL_DICT = {
             {"key_list": ["a"], "back_swing": 0.5}
         ],
         "handle_boss": [
-            {"key_list": ["e"], "back_swing": 0.5}
+            # {"key_list": ["e"], "back_swing": 0.5}
         ]
     },
     "papading": {
@@ -200,13 +200,15 @@ ALL_ROLE_SKILL_DICT = {
             # {"key_list": ["up", "up", "space"], "back_swing": 1},
         ],
         "handle_monster": [
+            {"key_list": ["s"], "back_swing": 1},
             {"key_list": ["g"], "back_swing": 1},
             {"key_list": ["f"], "back_swing": 1},
             {"key_list": ["d"], "back_swing": 1},
-            {"key_list": ["a"], "back_swing": 1}
+            {"key_list": ["a"], "back_swing": 1},
+            {"key_list": ["h"], "back_swing": 1}
         ],
         "handle_boss": [
-            {"key_list": ["g"], "back_swing": 1}
+            # {"key_list": ["g"], "back_swing": 1}
         ]
     }
 }
@@ -215,84 +217,84 @@ ALL_ROLE_DUNGEON_DICT = {
     "modao": [
         {
             "dungeon_name": "library",
-            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_icon": "dungeon_admirers",
             "dungeon_status": "todo",
             "dungeon_round": 20
         }],
     "zhanfa": [
         {
             "dungeon_name": "library",
-            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_icon": "dungeon_admirers",
             "dungeon_status": "todo",
             "dungeon_round": 20
         }],
     "zhaohuan": [
         {
             "dungeon_name": "library",
-            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_icon": "dungeon_admirers",
             "dungeon_status": "todo",
             "dungeon_round": 20
         }],
     "yuansu": [
         {
             "dungeon_name": "library",
-            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_icon": "dungeon_admirers",
             "dungeon_status": "todo",
             "dungeon_round": 20
         }],
     "nailuo": [
         {
             "dungeon_name": "library",
-            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_icon": "dungeon_admirers",
             "dungeon_status": "todo",
             "dungeon_round": 20
         }],
     "naima01": [
         {
             "dungeon_name": "library",
-            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_icon": "dungeon_admirers",
             "dungeon_status": "todo",
             "dungeon_round": 20
         }],
     "naima02": [
         {
             "dungeon_name": "library",
-            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_icon": "dungeon_admirers",
             "dungeon_status": "todo",
             "dungeon_round": 20
         }],
     "naima03": [
         {
             "dungeon_name": "library",
-            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_icon": "dungeon_admirers",
             "dungeon_status": "todo",
             "dungeon_round": 20
         }],
     "saber": [
         {
             "dungeon_name": "library",
-            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_icon": "dungeon_admirers",
             "dungeon_status": "todo",
             "dungeon_round": 20
         }],
     "papading": [
         {
             "dungeon_name": "library",
-            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_icon": "dungeon_admirers",
             "dungeon_status": "todo",
             "dungeon_round": 20
         }],
     "xiaoxiami": [
         {
             "dungeon_name": "library",
-            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_icon": "dungeon_admirers",
             "dungeon_status": "todo",
             "dungeon_round": 20
         }],
     "huahua": [
         {
             "dungeon_name": "library",
-            "dungeon_icon": "dungeon_library_icon",
+            "dungeon_icon": "dungeon_admirers",
             "dungeon_status": "todo",
             "dungeon_round": 20
         }],

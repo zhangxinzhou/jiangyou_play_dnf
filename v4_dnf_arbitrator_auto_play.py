@@ -474,8 +474,8 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
         #     press_key(_key_list=['x'])
         # 维修装备
         time.sleep(2)
-        press_key(_key_list=['s', 'space'], _back_swing=1)
-        press_key(_key_list=['esc', 'esc'], _back_swing=1)
+        press_key(_key_list=['s', 'space'], _duration=0.2, _back_swing=1)
+        press_key(_key_list=['esc', 'esc'], _duration=0.2, _back_swing=1)
 
     # 再次确认关闭商店
     if redis_has_label('dungeon_common_shop_box'):
