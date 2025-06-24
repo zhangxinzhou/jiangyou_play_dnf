@@ -382,8 +382,9 @@ def to_select_role_ui():
     # 存在游戏开始菜单,结束
     for i in range(RETRY_TIMES):
         if redis_has_label('town_game_start_button'):
-            time.sleep(1)
             return
+        else:
+            time.sleep(1)
 
     print('can not find labels [town_game_start_button]')
     sys.exit(-1)
@@ -614,6 +615,7 @@ def handle_dungeon_stage_clear(_role_name):
         elif redis_fuzzy_search_label('monster'):
             face_to_monster_or_boss()
             handle_monster(_role_name)
+            role_run()
         # 打boss
         elif redis_fuzzy_search_label('boss'):
             face_to_monster_or_boss()
