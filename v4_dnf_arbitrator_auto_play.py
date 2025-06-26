@@ -454,6 +454,7 @@ def handle_dungeon_stage_start(_role_name):
     _handle_buff = role_config.ALL_ROLE_SKILL_DICT.get(_role_name).get('handle_buff')
     wait_all_skill_enable()
     time.sleep(SLEEP_SECOND)
+    time.sleep(2)
     handle_key_list(_handle_buff)
 
 
@@ -476,7 +477,8 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
         # 维修装备
         time.sleep(2)
         press_key(_key_list=['s', 'space'], _duration=0.2, _back_swing=1)
-        press_key(_key_list=['esc', 'esc'], _duration=0.2, _back_swing=1)
+        press_key(_key_list=['esc'], _back_swing=0.5)
+        press_key(_key_list=['esc'], _back_swing=0.5)
 
     # 再次确认关闭商店
     if redis_has_label('dungeon_common_shop_box'):
@@ -615,7 +617,6 @@ def handle_dungeon_stage_clear(_role_name):
         elif redis_fuzzy_search_label('monster'):
             face_to_monster_or_boss()
             handle_monster(_role_name)
-            role_run()
         # 打boss
         elif redis_fuzzy_search_label('boss'):
             face_to_monster_or_boss()
