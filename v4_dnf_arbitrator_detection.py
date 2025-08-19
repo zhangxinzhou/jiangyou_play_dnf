@@ -44,6 +44,10 @@ def get_window_rect(hwnd):
 def q_image_to_cv2_mat(_q_image: QImage):
     tmp_img = _q_image.convertToFormat(QImage.Format_RGBX8888)
     ptr = tmp_img.constBits()
+    if ptr is None:
+        print('lost game window,it will exit in 5 second')
+        time.sleep(5)
+        sys.exit(-1)
     ptr.setsize(tmp_img.byteCount())
     _cv2_mat = np.array(ptr, copy=True).reshape(tmp_img.height(), tmp_img.width(), 4)
     _cv2_mat = cv2.cvtColor(_cv2_mat, cv2.COLOR_BGRA2RGB)

@@ -183,7 +183,7 @@ def redis_has_label(_label) -> bool:
     _last_n_labels = redis_get_last_n_labels_detail()
     for _index, _one in enumerate(_last_n_labels):
         # 只关注最近N帧
-        if _index > 4:
+        if _index > 2:
             return False
         _labels_dict: dict = _one
         if _labels_dict is None:
@@ -399,18 +399,31 @@ def to_dungeon_admirers():
     if redis_has_label('town_select_menu_ui_header'):
         press_key(_key_list=['esc'], _back_swing=0.5)
 
-    # 按键n打开世界地图，用page down到地图收藏
+    # 传送到终末崇拜者
+    is_success = False
     press_key(_key_list=['n'])
     time.sleep(0.1)
-    press_key(_key_list=['pagedown'])
-
-    # 传送到终末崇拜者
+    press_key(_key_list=['pageup'])
+    time.sleep(0.1)
     for i in range(RETRY_TIMES):
         time.sleep(SLEEP_SECOND)
         if redis_mouse_left_click_if_has_label(_dungeon_icon):
             time.sleep(SLEEP_SECOND)
+            is_success = True
             break
     time.sleep(2)
+
+    # 按键n打开世界地图，用page down到地图收藏
+    if not is_success:
+        press_key(_key_list=['pagedown'])
+
+        # 传送到终末崇拜者
+        for i in range(RETRY_TIMES):
+            time.sleep(SLEEP_SECOND)
+            if redis_mouse_left_click_if_has_label(_dungeon_icon):
+                time.sleep(SLEEP_SECOND)
+                break
+        time.sleep(2)
 
     # 移动到第一个入口（蓝色/城镇）
     press_key(_key_list=['right'], _duration=0.2)
@@ -421,20 +434,14 @@ def to_dungeon_admirers():
         redis_mouse_left_click_if_has_label(_dungeon_icon)
         time.sleep(SLEEP_SECOND)
 
-    # 不满足进入条件,如:门票,战斗力
-    if redis_has_label('dungeon_common_entry_disable'):
+    # 副本的图标还存在,说明不满足进入副本的条件,退出城镇
+    if redis_has_label(_dungeon_icon):
         # 不满足进入条件,退出到城镇
         press_key(_key_list=['f12'], _duration=0.5)
         print_red_color(
-            f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] identify label=[dungeon_common_entry_disable]')
+            f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] can not enter dungeon')
         return False
-    # 疲劳不满足,无法进入副本
-    if redis_has_label('dungeon_common_pl_disable'):
-        # 不满足进入条件,退出到城镇
-        press_key(_key_list=['f12'], _duration=0.5)
-        print_red_color(
-            f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] identify label=[dungeon_common_pl_disable]')
-        return False
+
     # 成功,进入副本
     return True
 
@@ -488,21 +495,21 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
         press_key(_key_list=['esc'], _back_swing=0.5)
 
     for i in range(3):
-        if _is_finish:
-            press_key(_key_list=['f12'], _back_swing=2)
-            return False
-        elif redis_has_label('dungeon_common_continue_gray'):
-            print_red_color(
-                f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] identify label=[dungeon_common_continue_gray]')
-            press_key(_key_list=['f12'], _back_swing=2)
-            return False
-        elif redis_has_label('dungeon_common_continue_normal'):
-            press_key(_key_list=['f10'], _back_swing=2)
+        # 有可能物品已经拾取,且站在地图右侧,自动进入下一个副本
+        if redis_has_label('dungeon_common_continue_box') or redis_has_label('dungeon_common_shop_box'):
+            if _is_finish:
+                press_key(_key_list=['f12'], _back_swing=2)
+                return False
+            elif redis_has_label('dungeon_common_continue_gray'):
+                print_red_color(
+                    f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] identify label=[dungeon_common_continue_gray]')
+                press_key(_key_list=['f12'], _back_swing=2)
+                return False
+            elif redis_has_label('dungeon_common_continue_normal'):
+                press_key(_key_list=['f10'], _back_swing=2)
+                return True
+        else:
             return True
-
-    # 终结
-    if redis_has_label('dungeon_common_arrow'):
-        return True
 
     press_key(_key_list=['f12'], _back_swing=2)
     return False
@@ -726,7 +733,7 @@ def play_one_role(_role_index, _role_name):
     # 领取奖励
     wait_all_skill_enable()
     # 畅玩任务,领取奖励
-    # handle_town_play_quest()
+    handle_town_play_quest()
     _cost = time.time() - _start_time
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] end')
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] role=[{_role_name:<15}] cost=[{_cost:.2f}] s')
