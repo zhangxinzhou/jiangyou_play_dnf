@@ -23,5 +23,5 @@ if __name__ == '__main__':
         print("system run success,exit")
     finally:
         # 最后关机 300秒
-        # os.system('shutdown -s -t 300')
+        # os.system('shutdown -s -t 60')
         print("finish")
