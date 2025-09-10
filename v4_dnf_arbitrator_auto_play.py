@@ -482,9 +482,11 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
         # 数字0 移动物品 捡东西
         time.sleep(2)
         press_key(_key_list=['left'], _duration=0.5)
-        time.sleep(1)
-        if redis_has_label('dungeon_common_continue_box') or redis_has_label('dungeon_common_shop_box'):
-            press_key(_key_list=['0'], _back_swing=0.5)
+        for i in range(3):
+            time.sleep(1)
+            if redis_has_label('dungeon_common_continue_box') or redis_has_label('dungeon_common_shop_box'):
+                press_key(_key_list=['0'], _back_swing=0.5)
+                continue
         # 维修装备
         time.sleep(2)
         press_key(_key_list=['s', 'space'], _duration=0.2, _back_swing=1)
@@ -585,6 +587,7 @@ def face_to_monster_or_boss():
 @print_method_name
 def handle_monster(_role_name):
     _skill_list = role_config.ALL_ROLE_SKILL_DICT.get(_role_name).get('handle_monster')
+    _do_skill = False
     for _skill_one in _skill_list:
         _skill_key = _skill_one.get('key_list')[0]
         if redis_get_skill_able(_skill_key):
@@ -592,7 +595,11 @@ def handle_monster(_role_name):
                       _duration=_skill_one.get('duration'),
                       _back_swing=_skill_one.get('back_swing'))
             time.sleep(0.1)
+            _do_skill = True
             return
+
+    if not _do_skill:
+        press_key(_key_list=['x'])
 
 
 @print_method_name
