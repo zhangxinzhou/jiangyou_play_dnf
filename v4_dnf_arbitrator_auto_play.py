@@ -57,6 +57,8 @@ def on_press(key):
             print(f"you press key [{key}], program will pause after a few seconds.")
         else:
             print(f"you press key [{key}], program will resume after a few seconds.")
+            # 将游戏窗口放在最前
+            win32gui.SetForegroundWindow(WINDOW_HWND)
 
 
 listener = keyboard.Listener(on_press=on_press)
@@ -359,6 +361,7 @@ def handle_town_play_quest():
 
 @print_method_name
 def to_select_role_ui():
+    time.sleep(0.5)
     # 存在游戏开始菜单,结束
     if redis_has_label('town_game_start_button'):
         return
@@ -410,6 +413,7 @@ def to_dungeon_admirers():
         if redis_mouse_left_click_if_has_label(_dungeon_icon):
             time.sleep(SLEEP_SECOND)
             is_success = True
+            print("pagedown")
             break
     time.sleep(2)
 
@@ -423,13 +427,14 @@ def to_dungeon_admirers():
             if redis_mouse_left_click_if_has_label(_dungeon_icon):
                 time.sleep(SLEEP_SECOND)
                 is_success = True
+                print("pageup")
                 break
         time.sleep(2)
 
     if is_success:
-        print("find the dungeon_ icon")
+        print("find the dungeon icon")
     else:
-        print("can not find dungeon_ icon")
+        print("can not find dungeon icon")
 
     # 移动到第一个入口（蓝色/城镇）
     press_key(_key_list=['right'], _duration=0.2)
@@ -486,7 +491,7 @@ def handle_dungeon_stage_end(_role_name, _is_finish=False) -> bool:
             time.sleep(1)
             if redis_has_label('dungeon_common_continue_box') or redis_has_label('dungeon_common_shop_box'):
                 press_key(_key_list=['0'], _back_swing=0.5)
-                continue
+                break
         # 维修装备
         time.sleep(2)
         press_key(_key_list=['s', 'space'], _duration=0.2, _back_swing=1)
