@@ -19,9 +19,13 @@ if __name__ == '__main__':
     except Exception as e:
         print("system error, exit")
         logging.log(e)
+    except KeyboardInterrupt as e:
+        print("system interrupt, exit")
+        logging.log(e)
     else:
         print("system run success,exit")
     finally:
-        # 最后关机 300秒
-        os.system('shutdown -s -t 60')
+        # 最后关机 300秒AH
         print("finish")
+        if auto_play.PROGRAM_EXIT:
+            os.system('shutdown -s -t 60')

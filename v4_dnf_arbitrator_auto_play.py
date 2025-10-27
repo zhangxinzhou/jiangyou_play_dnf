@@ -418,6 +418,7 @@ def to_dungeon_admirers():
     time.sleep(1)
     press_key(_key_list=['right'], _duration=0.5)
     press_key(_key_list=['left'], _duration=2)
+    press_key(_key_list=['down'], _duration=0.5)
 
     # 点击副本icon
     for i in range(5):
