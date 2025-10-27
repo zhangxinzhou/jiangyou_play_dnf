@@ -27,5 +27,5 @@ if __name__ == '__main__':
     finally:
         # 最后关机 300秒AH
         print("finish")
-        if auto_play.PROGRAM_EXIT:
+        if not auto_play.PROGRAM_EXIT:
             os.system('shutdown -s -t 60')
