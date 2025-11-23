@@ -1,3 +1,4 @@
+import datetime
 import os
 import time
 import logging
@@ -27,5 +28,15 @@ if __name__ == '__main__':
     finally:
         # 最后关机 300秒AH
         print("finish")
-        if not auto_play.PROGRAM_EXIT:
-            os.system('shutdown -s -t 60')
+        # 判断是不是工作日，工作日关机
+        now = datetime.datetime.now()
+        weekday = now.weekday()
+        work_day: bool = weekday < 5
+        print(f"是否周末：{work_day}")
+        shutdown: bool = not auto_play.PROGRAM_EXIT and work_day
+        if shutdown:
+            print('xxxx')
+            os.system('shutdown -s -t 300')
+
+            # stop关机命令
+            # os.system('shutdown /a')

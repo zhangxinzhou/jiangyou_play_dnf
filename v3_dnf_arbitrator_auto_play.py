@@ -281,7 +281,7 @@ def wait_detection_working():
             print_red_color(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] detection is working')
             break
         # 等待
-        time.sleep(SLEEP_SECOND)
+        time.sleep(1)
 
 
 def print_method_name(func):
